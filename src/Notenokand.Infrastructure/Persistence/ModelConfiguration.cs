@@ -110,3 +110,52 @@ public sealed class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
         b.HasIndex(x => x.OccurredAt);
     }
 }
+
+public sealed class ThaiProvinceConfiguration : IEntityTypeConfiguration<ThaiProvince>
+{
+    public void Configure(EntityTypeBuilder<ThaiProvince> b)
+    {
+        b.HasKey(x => x.Code);
+        b.Property(x => x.Code).ValueGeneratedNever();
+        b.Property(x => x.NameTh).HasMaxLength(100);
+        b.Property(x => x.NameEn).HasMaxLength(100);
+        b.HasIndex(x => x.NameTh);
+    }
+}
+
+public sealed class ThaiDistrictConfiguration : IEntityTypeConfiguration<ThaiDistrict>
+{
+    public void Configure(EntityTypeBuilder<ThaiDistrict> b)
+    {
+        b.HasKey(x => x.Code);
+        b.Property(x => x.Code).ValueGeneratedNever();
+        b.Property(x => x.NameTh).HasMaxLength(100);
+        b.Property(x => x.NameEn).HasMaxLength(100);
+        b.HasOne(x => x.Province).WithMany(x => x.Districts).HasForeignKey(x => x.ProvinceCode).OnDelete(DeleteBehavior.Restrict);
+        b.HasIndex(x => new { x.ProvinceCode, x.NameTh });
+    }
+}
+
+public sealed class ThaiSubdistrictConfiguration : IEntityTypeConfiguration<ThaiSubdistrict>
+{
+    public void Configure(EntityTypeBuilder<ThaiSubdistrict> b)
+    {
+        b.HasKey(x => x.Code);
+        b.Property(x => x.Code).ValueGeneratedNever();
+        b.Property(x => x.NameTh).HasMaxLength(100);
+        b.Property(x => x.NameEn).HasMaxLength(100);
+        b.HasOne(x => x.District).WithMany(x => x.Subdistricts).HasForeignKey(x => x.DistrictCode).OnDelete(DeleteBehavior.Restrict);
+        b.HasIndex(x => new { x.DistrictCode, x.NameTh });
+    }
+}
+
+public sealed class ThaiSubdistrictPostalCodeConfiguration : IEntityTypeConfiguration<ThaiSubdistrictPostalCode>
+{
+    public void Configure(EntityTypeBuilder<ThaiSubdistrictPostalCode> b)
+    {
+        b.HasKey(x => new { x.SubdistrictCode, x.PostalCode });
+        b.Property(x => x.PostalCode).HasColumnType("char(5)");
+        b.HasOne(x => x.Subdistrict).WithMany(x => x.PostalCodes).HasForeignKey(x => x.SubdistrictCode).OnDelete(DeleteBehavior.Cascade);
+        b.HasIndex(x => x.PostalCode);
+    }
+}

@@ -30,6 +30,10 @@ public sealed class NotenokandDbContext(DbContextOptions<NotenokandDbContext> op
     public DbSet<QualityBand> QualityBands => Set<QualityBand>();
     public DbSet<QualityScore> QualityScores => Set<QualityScore>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<ThaiProvince> ThaiProvinces => Set<ThaiProvince>();
+    public DbSet<ThaiDistrict> ThaiDistricts => Set<ThaiDistrict>();
+    public DbSet<ThaiSubdistrict> ThaiSubdistricts => Set<ThaiSubdistrict>();
+    public DbSet<ThaiSubdistrictPostalCode> ThaiSubdistrictPostalCodes => Set<ThaiSubdistrictPostalCode>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

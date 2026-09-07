@@ -958,3 +958,108 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907035802_AddThaiAddressReferenceData'
+)
+BEGIN
+    CREATE TABLE [ThaiProvinces] (
+        [Code] smallint NOT NULL,
+        [NameTh] nvarchar(100) NOT NULL,
+        [NameEn] nvarchar(100) NOT NULL,
+        [IsActive] bit NOT NULL,
+        CONSTRAINT [PK_ThaiProvinces] PRIMARY KEY ([Code])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907035802_AddThaiAddressReferenceData'
+)
+BEGIN
+    CREATE TABLE [ThaiDistricts] (
+        [Code] int NOT NULL,
+        [ProvinceCode] smallint NOT NULL,
+        [NameTh] nvarchar(100) NOT NULL,
+        [NameEn] nvarchar(100) NOT NULL,
+        [IsActive] bit NOT NULL,
+        CONSTRAINT [PK_ThaiDistricts] PRIMARY KEY ([Code]),
+        CONSTRAINT [FK_ThaiDistricts_ThaiProvinces_ProvinceCode] FOREIGN KEY ([ProvinceCode]) REFERENCES [ThaiProvinces] ([Code]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907035802_AddThaiAddressReferenceData'
+)
+BEGIN
+    CREATE TABLE [ThaiSubdistricts] (
+        [Code] int NOT NULL,
+        [DistrictCode] int NOT NULL,
+        [NameTh] nvarchar(100) NOT NULL,
+        [NameEn] nvarchar(100) NOT NULL,
+        [IsActive] bit NOT NULL,
+        CONSTRAINT [PK_ThaiSubdistricts] PRIMARY KEY ([Code]),
+        CONSTRAINT [FK_ThaiSubdistricts_ThaiDistricts_DistrictCode] FOREIGN KEY ([DistrictCode]) REFERENCES [ThaiDistricts] ([Code]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907035802_AddThaiAddressReferenceData'
+)
+BEGIN
+    CREATE TABLE [ThaiSubdistrictPostalCodes] (
+        [SubdistrictCode] int NOT NULL,
+        [PostalCode] char(5) NOT NULL,
+        [IsPrimary] bit NOT NULL,
+        CONSTRAINT [PK_ThaiSubdistrictPostalCodes] PRIMARY KEY ([SubdistrictCode], [PostalCode]),
+        CONSTRAINT [FK_ThaiSubdistrictPostalCodes_ThaiSubdistricts_SubdistrictCode] FOREIGN KEY ([SubdistrictCode]) REFERENCES [ThaiSubdistricts] ([Code]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907035802_AddThaiAddressReferenceData'
+)
+BEGIN
+    CREATE INDEX [IX_ThaiDistricts_ProvinceCode_NameTh] ON [ThaiDistricts] ([ProvinceCode], [NameTh]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907035802_AddThaiAddressReferenceData'
+)
+BEGIN
+    CREATE INDEX [IX_ThaiProvinces_NameTh] ON [ThaiProvinces] ([NameTh]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907035802_AddThaiAddressReferenceData'
+)
+BEGIN
+    CREATE INDEX [IX_ThaiSubdistrictPostalCodes_PostalCode] ON [ThaiSubdistrictPostalCodes] ([PostalCode]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907035802_AddThaiAddressReferenceData'
+)
+BEGIN
+    CREATE INDEX [IX_ThaiSubdistricts_DistrictCode_NameTh] ON [ThaiSubdistricts] ([DistrictCode], [NameTh]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907035802_AddThaiAddressReferenceData'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260907035802_AddThaiAddressReferenceData', N'10.0.9');
+END;
+
+COMMIT;
+GO
+

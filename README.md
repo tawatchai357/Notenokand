@@ -27,3 +27,15 @@
 ```
 
 ห้าม commit รหัสผ่านหรือไฟล์ `appsettings.Local.json` ขึ้น GitHub
+
+## ข้อมูลที่อยู่ประเทศไทย
+
+ตารางอ้างอิงประกอบด้วยจังหวัด อำเภอ/เขต ตำบล/แขวง และรหัสไปรษณีย์ ข้อมูลต้นทางและ license อยู่ใน `data/thai-addresses`
+
+นำเข้าหรืออัปเดตข้อมูลแบบ idempotent ด้วยคำสั่ง:
+
+```powershell
+dotnet run --project tools/Notenokand.DataImporter/Notenokand.DataImporter.csproj
+```
+
+สามารถส่ง connection string อื่นด้วยตัวเลือก `--connection` โดยไม่บันทึกรหัสผ่านลง source control
