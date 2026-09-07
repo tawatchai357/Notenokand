@@ -60,6 +60,9 @@ public sealed class BuildingsController(NotenokandDbContext db, UserManager<Appl
             FloorCount = model.FloorCount,
             RoomCount = model.RoomCount,
             AreaSquareMeters = model.AreaSquareMeters,
+            WidthMeters = model.WidthMeters,
+            DepthMeters = model.DepthMeters,
+            ConstructionBudget = model.ConstructionBudget,
             Notes = NullIfWhiteSpace(model.Notes),
             Status = model.Status,
             CreatedByUserId = userId
@@ -83,7 +86,9 @@ public sealed class BuildingsController(NotenokandDbContext db, UserManager<Appl
             SubdistrictCode = building.SubdistrictCode, PostalCode = building.PostalCode ?? string.Empty,
             Latitude = building.Latitude, Longitude = building.Longitude, StartedOn = building.StartedOn,
             FloorCount = building.FloorCount, RoomCount = building.RoomCount,
-            AreaSquareMeters = building.AreaSquareMeters, Notes = building.Notes, Status = building.Status,
+            AreaSquareMeters = building.AreaSquareMeters, WidthMeters = building.WidthMeters,
+            DepthMeters = building.DepthMeters, ConstructionBudget = building.ConstructionBudget,
+            Notes = building.Notes, Status = building.Status,
             Provinces = await LoadProvincesAsync()
         });
     }
@@ -113,6 +118,8 @@ public sealed class BuildingsController(NotenokandDbContext db, UserManager<Appl
         building.Latitude = model.Latitude; building.Longitude = model.Longitude;
         building.StartedOn = model.StartedOn; building.FloorCount = model.FloorCount;
         building.RoomCount = model.RoomCount; building.AreaSquareMeters = model.AreaSquareMeters;
+        building.WidthMeters = model.WidthMeters; building.DepthMeters = model.DepthMeters;
+        building.ConstructionBudget = model.ConstructionBudget;
         building.Notes = NullIfWhiteSpace(model.Notes); building.Status = model.Status;
         building.UpdatedAt = DateTimeOffset.UtcNow; building.UpdatedByUserId = userId;
         await db.SaveChangesAsync();

@@ -21,6 +21,9 @@ public sealed class BirdBuilding : Entity
     public int? FloorCount { get; set; }
     public int? RoomCount { get; set; }
     public decimal? AreaSquareMeters { get; set; }
+    public decimal? WidthMeters { get; set; }
+    public decimal? DepthMeters { get; set; }
+    public decimal? ConstructionBudget { get; set; }
     public string? Notes { get; set; }
     public BuildingStatus Status { get; set; } = BuildingStatus.Active;
     public ICollection<BuildingUser> Users { get; set; } = [];

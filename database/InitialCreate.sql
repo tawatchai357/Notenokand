@@ -1538,3 +1538,40 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907080748_AddBuildingDimensionsAndBudget'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [ConstructionBudget] decimal(18,2) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907080748_AddBuildingDimensionsAndBudget'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [DepthMeters] decimal(10,2) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907080748_AddBuildingDimensionsAndBudget'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [WidthMeters] decimal(10,2) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907080748_AddBuildingDimensionsAndBudget'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260907080748_AddBuildingDimensionsAndBudget', N'10.0.9');
+END;
+
+COMMIT;
+GO
+

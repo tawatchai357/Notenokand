@@ -62,6 +62,17 @@ public sealed class BuildingEditViewModel
     [Range(typeof(decimal), "0.01", "9999999999", ErrorMessage = "พื้นที่ต้องมากกว่า 0")]
     [Display(Name = "พื้นที่โดยประมาณ (ตร.ม.)")]
     public decimal? AreaSquareMeters { get; set; }
+    [Range(typeof(decimal), "0.01", "99999999", ErrorMessage = "หน้ากว้างต้องมากกว่า 0")]
+    [Display(Name = "หน้ากว้าง (เมตร)")]
+    public decimal? WidthMeters { get; set; }
+
+    [Range(typeof(decimal), "0.01", "99999999", ErrorMessage = "ความลึกต้องมากกว่า 0")]
+    [Display(Name = "ความลึก (เมตร)")]
+    public decimal? DepthMeters { get; set; }
+
+    [Range(typeof(decimal), "0", "9999999999999999", ErrorMessage = "งบประมาณต้องไม่ติดลบ")]
+    [Display(Name = "งบประมาณการก่อสร้าง (บาท)")]
+    public decimal? ConstructionBudget { get; set; }
 
     [StringLength(2000)]
     [Display(Name = "หมายเหตุ")]
@@ -85,4 +96,7 @@ public sealed class BuildingCardViewModel
     public BuildingStatus Status { get; init; }
     public int? FloorCount { get; init; }
     public int? RoomCount { get; init; }
+    public decimal? WidthMeters { get; init; }
+    public decimal? DepthMeters { get; init; }
+    public decimal? ConstructionBudget { get; init; }
 }
