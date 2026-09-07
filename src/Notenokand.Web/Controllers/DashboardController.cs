@@ -31,6 +31,7 @@ public sealed class DashboardController(NotenokandDbContext db, UserManager<Appl
             Id = x.Id, Code = x.Code, Name = x.Name, Latitude = x.Latitude, Longitude = x.Longitude,
             Status = x.Status, FloorCount = x.FloorCount, RoomCount = x.RoomCount,
             WidthMeters = x.WidthMeters, DepthMeters = x.DepthMeters, ConstructionBudget = x.ConstructionBudget,
+            BuiltOrPurchasedYearBuddhist = x.BuiltOrPurchasedYear.HasValue ? x.BuiltOrPurchasedYear.Value + 543 : null,
             Location = BuildLocation(x.SubdistrictCode, x.DistrictCode, x.Province, x.PostalCode, subdistricts, districts)
         }).ToList();
 

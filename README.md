@@ -64,3 +64,17 @@ dotnet run --project tools/Notenokand.DataImporter/Notenokand.DataImporter.cspro
 ```
 
 สามารถส่ง connection string อื่นด้วยตัวเลือก `--connection` โดยไม่บันทึกรหัสผ่านลง source control
+## Thai Date/DateTime Picker
+
+ปฏิทินกลางโหลดจาก Layout ทุกหน้า แสดงชื่อเดือนภาษาไทยและปี พ.ศ. แต่ส่งค่า ISO ให้ฝั่งเซิร์ฟเวอร์
+
+- วันที่: ช่องแสดงผลใช้ `data-thai-datepicker` และระบุ `data-target` ไปยัง hidden input
+- วันที่และเวลา: ใช้ `data-thai-datetimepicker` ด้วยโครงสร้างเดียวกัน
+- DateOnly และ DateTime ถูกอ่านผ่าน `IsoTemporalModelBinder` เพื่อไม่ให้ Thai culture แปลงปีซ้ำ
+
+ตัวอย่าง:
+
+```html
+<input id="EventDate" name="EventDate" type="hidden" data-thai-date-value />
+<input type="text" data-thai-datepicker data-target="EventDate" readonly />
+```

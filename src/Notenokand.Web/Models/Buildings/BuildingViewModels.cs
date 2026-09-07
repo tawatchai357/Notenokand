@@ -50,6 +50,9 @@ public sealed class BuildingEditViewModel
     [Display(Name = "วันที่เริ่มใช้งาน")]
     [DataType(DataType.Date)]
     public DateOnly? StartedOn { get; set; }
+    [Range(2400, 2700, ErrorMessage = "กรุณากรอกปี พ.ศ. ระหว่าง 2400 ถึง 2700")]
+    [Display(Name = "ปี พ.ศ. ที่สร้างหรือซื้อตึก")]
+    public int? BuiltOrPurchasedYearBuddhist { get; set; }
 
     [Range(1, 999, ErrorMessage = "จำนวนชั้นต้องมากกว่า 0")]
     [Display(Name = "จำนวนชั้น")]
@@ -99,4 +102,5 @@ public sealed class BuildingCardViewModel
     public decimal? WidthMeters { get; init; }
     public decimal? DepthMeters { get; init; }
     public decimal? ConstructionBudget { get; init; }
+    public int? BuiltOrPurchasedYearBuddhist { get; init; }
 }

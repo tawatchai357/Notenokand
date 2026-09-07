@@ -17,7 +17,7 @@
 }
 <main role="main" class="@(ViewData["BodyClass"] == null ? "container app-main" : "")">@RenderBody()</main>
 @if (ViewData["BodyClass"] == null) { <footer class="site-footer"><div class="container"><a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">N</span><span>NOTENOKAND</span></a><div><a asp-controller="Home" asp-action="Terms">ข้อกำหนด</a><a asp-controller="Home" asp-action="Privacy">ความเป็นส่วนตัว</a><span>© 2026 Notenokand</span></div></div></footer> }
-<script src="~/lib/jquery/dist/jquery.min.js"></script><script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script><script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><script src="~/js/thai-datetime-picker.js" asp-append-version="true"></script><script src="~/js/site.js" asp-append-version="true"></script>
 @if (TempData["SuccessMessage"] is string successMessage) { <script>window.notenokandAlert = @Html.Raw(JsonSerializer.Serialize(successMessage));</script> }
 @await RenderSectionAsync("Scripts", required: false)
 </body></html>

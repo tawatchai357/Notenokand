@@ -18,6 +18,7 @@ public sealed class BirdBuilding : Entity
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
     public DateOnly? StartedOn { get; set; }
+    public short? BuiltOrPurchasedYear { get; set; }
     public int? FloorCount { get; set; }
     public int? RoomCount { get; set; }
     public decimal? AreaSquareMeters { get; set; }

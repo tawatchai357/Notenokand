@@ -57,6 +57,7 @@ public sealed class BuildingsController(NotenokandDbContext db, UserManager<Appl
             Latitude = model.Latitude,
             Longitude = model.Longitude,
             StartedOn = model.StartedOn,
+            BuiltOrPurchasedYear = ToGregorianYear(model.BuiltOrPurchasedYearBuddhist),
             FloorCount = model.FloorCount,
             RoomCount = model.RoomCount,
             AreaSquareMeters = model.AreaSquareMeters,
@@ -85,6 +86,7 @@ public sealed class BuildingsController(NotenokandDbContext db, UserManager<Appl
             ProvinceCode = building.ProvinceCode, DistrictCode = building.DistrictCode,
             SubdistrictCode = building.SubdistrictCode, PostalCode = building.PostalCode ?? string.Empty,
             Latitude = building.Latitude, Longitude = building.Longitude, StartedOn = building.StartedOn,
+            BuiltOrPurchasedYearBuddhist = ToBuddhistYear(building.BuiltOrPurchasedYear),
             FloorCount = building.FloorCount, RoomCount = building.RoomCount,
             AreaSquareMeters = building.AreaSquareMeters, WidthMeters = building.WidthMeters,
             DepthMeters = building.DepthMeters, ConstructionBudget = building.ConstructionBudget,
@@ -116,7 +118,8 @@ public sealed class BuildingsController(NotenokandDbContext db, UserManager<Appl
         building.ProvinceCode = model.ProvinceCode; building.DistrictCode = model.DistrictCode;
         building.SubdistrictCode = model.SubdistrictCode; building.PostalCode = model.PostalCode;
         building.Latitude = model.Latitude; building.Longitude = model.Longitude;
-        building.StartedOn = model.StartedOn; building.FloorCount = model.FloorCount;
+        building.StartedOn = model.StartedOn;
+        building.BuiltOrPurchasedYear = ToGregorianYear(model.BuiltOrPurchasedYearBuddhist); building.FloorCount = model.FloorCount;
         building.RoomCount = model.RoomCount; building.AreaSquareMeters = model.AreaSquareMeters;
         building.WidthMeters = model.WidthMeters; building.DepthMeters = model.DepthMeters;
         building.ConstructionBudget = model.ConstructionBudget;
@@ -169,5 +172,7 @@ public sealed class BuildingsController(NotenokandDbContext db, UserManager<Appl
         return $"BLD-{number:000}";
     }
     private async Task<IReadOnlyList<SelectListItem>> LoadProvincesAsync() => await db.ThaiProvinces.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.NameTh).Select(x => new SelectListItem(x.NameTh, x.Code.ToString())).ToListAsync();
+    private static short? ToGregorianYear(int? buddhistYear) => buddhistYear.HasValue ? checked((short)(buddhistYear.Value - 543)) : null;
+    private static int? ToBuddhistYear(short? gregorianYear) => gregorianYear.HasValue ? gregorianYear.Value + 543 : null;
     private static string? NullIfWhiteSpace(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }

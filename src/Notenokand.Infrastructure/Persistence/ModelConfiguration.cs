@@ -18,6 +18,7 @@ public sealed class BirdBuildingConfiguration : IEntityTypeConfiguration<BirdBui
         b.Property(x => x.WidthMeters).HasPrecision(10, 2);
         b.Property(x => x.DepthMeters).HasPrecision(10, 2);
         b.Property(x => x.ConstructionBudget).HasPrecision(18, 2);
+        b.Property(x => x.BuiltOrPurchasedYear).HasColumnType("smallint");
         b.Property(x => x.PostalCode).HasColumnType("char(5)");
         b.HasOne<ThaiProvince>().WithMany().HasForeignKey(x => x.ProvinceCode).OnDelete(DeleteBehavior.Restrict);
         b.HasOne<ThaiDistrict>().WithMany().HasForeignKey(x => x.DistrictCode).OnDelete(DeleteBehavior.Restrict);

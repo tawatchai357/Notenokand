@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Notenokand.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Notenokand.Infrastructure.Persistence;
 namespace Notenokand.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(NotenokandDbContext))]
-    partial class NotenokandDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260907081513_AddBuildingBuiltOrPurchasedYear")]
+    partial class AddBuildingBuiltOrPurchasedYear
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

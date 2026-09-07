@@ -1575,3 +1575,24 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907081513_AddBuildingBuiltOrPurchasedYear'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [BuiltOrPurchasedYear] smallint NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907081513_AddBuildingBuiltOrPurchasedYear'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260907081513_AddBuildingBuiltOrPurchasedYear', N'10.0.9');
+END;
+
+COMMIT;
+GO
+
