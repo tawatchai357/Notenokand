@@ -28,6 +28,9 @@ public sealed class AccountController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
+        if (!model.AcceptTerms)
+            ModelState.AddModelError(nameof(model.AcceptTerms), "กรุณายอมรับเงื่อนไขและนโยบายความเป็นส่วนตัว");
+
         if (!ModelState.IsValid)
             return View(model);
 

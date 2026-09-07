@@ -29,8 +29,6 @@ public sealed class RegisterViewModel
     [Compare(nameof(Password), ErrorMessage = "รหัสผ่านทั้งสองช่องไม่ตรงกัน")]
     [Display(Name = "ยืนยันรหัสผ่าน")]
     public string ConfirmPassword { get; set; } = string.Empty;
-
-    [Range(typeof(bool), "true", "true", ErrorMessage = "กรุณายอมรับเงื่อนไขและนโยบายความเป็นส่วนตัว")]
     public bool AcceptTerms { get; set; }
 }
 
