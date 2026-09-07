@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Notenokand.Domain/Notenokand.Domain.csproj" />
+    <Project Path="src/Notenokand.Infrastructure/Notenokand.Infrastructure.csproj" />
+    <Project Path="src/Notenokand.Web/Notenokand.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Notenokand.Tests/Notenokand.Tests.csproj" />
+  </Folder>
+</Solution>

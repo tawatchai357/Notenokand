@@ -1,0 +1,859 @@
+﻿IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
+BEGIN
+    CREATE TABLE [__EFMigrationsHistory] (
+        [MigrationId] nvarchar(150) NOT NULL,
+        [ProductVersion] nvarchar(32) NOT NULL,
+        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+    );
+END;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [AspNetRoles] (
+        [Id] uniqueidentifier NOT NULL,
+        [Name] nvarchar(256) NULL,
+        [NormalizedName] nvarchar(256) NULL,
+        [ConcurrencyStamp] nvarchar(max) NULL,
+        CONSTRAINT [PK_AspNetRoles] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [AspNetUsers] (
+        [Id] uniqueidentifier NOT NULL,
+        [DisplayName] nvarchar(max) NOT NULL,
+        [IsActive] bit NOT NULL,
+        [CreatedAt] datetimeoffset NOT NULL,
+        [UserName] nvarchar(256) NULL,
+        [NormalizedUserName] nvarchar(256) NULL,
+        [Email] nvarchar(256) NULL,
+        [NormalizedEmail] nvarchar(256) NULL,
+        [EmailConfirmed] bit NOT NULL,
+        [PasswordHash] nvarchar(max) NULL,
+        [SecurityStamp] nvarchar(max) NULL,
+        [ConcurrencyStamp] nvarchar(max) NULL,
+        [PhoneNumber] nvarchar(max) NULL,
+        [PhoneNumberConfirmed] bit NOT NULL,
+        [TwoFactorEnabled] bit NOT NULL,
+        [LockoutEnd] datetimeoffset NULL,
+        [LockoutEnabled] bit NOT NULL,
+        [AccessFailedCount] int NOT NULL,
+        CONSTRAINT [PK_AspNetUsers] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [AuditLogs] (
+        [Id] bigint NOT NULL IDENTITY,
+        [UserId] uniqueidentifier NULL,
+        [Action] nvarchar(50) NOT NULL,
+        [EntityName] nvarchar(200) NOT NULL,
+        [EntityId] nvarchar(100) NOT NULL,
+        [ChangesJson] nvarchar(max) NULL,
+        [IpAddress] nvarchar(max) NULL,
+        [OccurredAt] datetimeoffset(0) NOT NULL,
+        CONSTRAINT [PK_AuditLogs] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [BirdBuildings] (
+        [Id] uniqueidentifier NOT NULL,
+        [OwnerUserId] uniqueidentifier NOT NULL,
+        [Code] nvarchar(30) NOT NULL,
+        [Name] nvarchar(200) NOT NULL,
+        [Province] nvarchar(max) NULL,
+        [Address] nvarchar(max) NULL,
+        [Latitude] decimal(10,7) NULL,
+        [Longitude] decimal(10,7) NULL,
+        [StartedOn] date NULL,
+        [FloorCount] int NULL,
+        [RoomCount] int NULL,
+        [AreaSquareMeters] decimal(12,2) NULL,
+        [Notes] nvarchar(max) NULL,
+        [Status] int NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_BirdBuildings] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [Buyers] (
+        [Id] uniqueidentifier NOT NULL,
+        [OwnerUserId] uniqueidentifier NOT NULL,
+        [Name] nvarchar(max) NOT NULL,
+        [TaxId] nvarchar(max) NULL,
+        [Phone] nvarchar(max) NULL,
+        [Email] nvarchar(max) NULL,
+        [Address] nvarchar(max) NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_Buyers] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [ExpenseCategories] (
+        [Id] uniqueidentifier NOT NULL,
+        [OwnerUserId] uniqueidentifier NOT NULL,
+        [Name] nvarchar(max) NOT NULL,
+        [SortOrder] int NOT NULL,
+        [IsActive] bit NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_ExpenseCategories] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [FinancialTransactions] (
+        [Id] uniqueidentifier NOT NULL,
+        [OwnerUserId] uniqueidentifier NOT NULL,
+        [BuildingId] uniqueidentifier NULL,
+        [HarvestRoundId] uniqueidentifier NULL,
+        [SaleId] uniqueidentifier NULL,
+        [MaintenanceJobId] uniqueidentifier NULL,
+        [ExpenseCategoryId] uniqueidentifier NULL,
+        [Type] int NOT NULL,
+        [TransactionDate] date NOT NULL,
+        [PaidOn] date NULL,
+        [Description] nvarchar(max) NOT NULL,
+        [Amount] decimal(18,2) NOT NULL,
+        [ReferenceNumber] nvarchar(max) NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_FinancialTransactions] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [MaintenanceJobs] (
+        [Id] uniqueidentifier NOT NULL,
+        [BuildingId] uniqueidentifier NOT NULL,
+        [AssetId] uniqueidentifier NULL,
+        [Type] int NOT NULL,
+        [Priority] int NOT NULL,
+        [Status] int NOT NULL,
+        [Issue] nvarchar(max) NOT NULL,
+        [ReportedAt] datetimeoffset NOT NULL,
+        [StartedAt] datetimeoffset NULL,
+        [CompletedAt] datetimeoffset NULL,
+        [AssignedUserId] uniqueidentifier NULL,
+        [PartsCost] decimal(18,2) NOT NULL,
+        [LaborCost] decimal(18,2) NOT NULL,
+        [DowntimeHours] decimal(18,2) NOT NULL,
+        [AcceptanceResult] nvarchar(max) NULL,
+        [NextInspectionOn] date NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_MaintenanceJobs] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [MasterOptions] (
+        [Id] uniqueidentifier NOT NULL,
+        [Category] nvarchar(50) NOT NULL,
+        [Code] nvarchar(50) NOT NULL,
+        [Name] nvarchar(200) NOT NULL,
+        [SortOrder] int NOT NULL,
+        [IsActive] bit NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_MasterOptions] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [QualityStandards] (
+        [Id] uniqueidentifier NOT NULL,
+        [OwnerUserId] uniqueidentifier NOT NULL,
+        [Name] nvarchar(450) NOT NULL,
+        [Version] int NOT NULL,
+        [EffectiveFrom] date NOT NULL,
+        [IsActive] bit NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_QualityStandards] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [AspNetRoleClaims] (
+        [Id] int NOT NULL IDENTITY,
+        [RoleId] uniqueidentifier NOT NULL,
+        [ClaimType] nvarchar(max) NULL,
+        [ClaimValue] nvarchar(max) NULL,
+        CONSTRAINT [PK_AspNetRoleClaims] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_AspNetRoleClaims_AspNetRoles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [AspNetRoles] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [AspNetUserClaims] (
+        [Id] int NOT NULL IDENTITY,
+        [UserId] uniqueidentifier NOT NULL,
+        [ClaimType] nvarchar(max) NULL,
+        [ClaimValue] nvarchar(max) NULL,
+        CONSTRAINT [PK_AspNetUserClaims] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_AspNetUserClaims_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [AspNetUserLogins] (
+        [LoginProvider] nvarchar(450) NOT NULL,
+        [ProviderKey] nvarchar(450) NOT NULL,
+        [ProviderDisplayName] nvarchar(max) NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_AspNetUserLogins] PRIMARY KEY ([LoginProvider], [ProviderKey]),
+        CONSTRAINT [FK_AspNetUserLogins_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [AspNetUserRoles] (
+        [UserId] uniqueidentifier NOT NULL,
+        [RoleId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_AspNetUserRoles] PRIMARY KEY ([UserId], [RoleId]),
+        CONSTRAINT [FK_AspNetUserRoles_AspNetRoles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [AspNetRoles] ([Id]) ON DELETE CASCADE,
+        CONSTRAINT [FK_AspNetUserRoles_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [AspNetUserTokens] (
+        [UserId] uniqueidentifier NOT NULL,
+        [LoginProvider] nvarchar(450) NOT NULL,
+        [Name] nvarchar(450) NOT NULL,
+        [Value] nvarchar(max) NULL,
+        CONSTRAINT [PK_AspNetUserTokens] PRIMARY KEY ([UserId], [LoginProvider], [Name]),
+        CONSTRAINT [FK_AspNetUserTokens_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [Assets] (
+        [Id] uniqueidentifier NOT NULL,
+        [BuildingId] uniqueidentifier NOT NULL,
+        [Code] nvarchar(max) NOT NULL,
+        [Name] nvarchar(max) NOT NULL,
+        [Location] nvarchar(max) NULL,
+        [InstalledOn] date NULL,
+        [NextInspectionOn] date NULL,
+        [IsActive] bit NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_Assets] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Assets_BirdBuildings_BuildingId] FOREIGN KEY ([BuildingId]) REFERENCES [BirdBuildings] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [BuildingUsers] (
+        [Id] uniqueidentifier NOT NULL,
+        [BuildingId] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_BuildingUsers] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_BuildingUsers_BirdBuildings_BuildingId] FOREIGN KEY ([BuildingId]) REFERENCES [BirdBuildings] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [DailyLogs] (
+        [Id] uniqueidentifier NOT NULL,
+        [BuildingId] uniqueidentifier NOT NULL,
+        [LogDate] date NOT NULL,
+        [Type] int NOT NULL,
+        [Title] nvarchar(max) NOT NULL,
+        [Details] nvarchar(max) NULL,
+        [HarvestRoundId] uniqueidentifier NULL,
+        [FinancialTransactionId] uniqueidentifier NULL,
+        [MaintenanceJobId] uniqueidentifier NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_DailyLogs] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_DailyLogs_BirdBuildings_BuildingId] FOREIGN KEY ([BuildingId]) REFERENCES [BirdBuildings] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [HarvestRounds] (
+        [Id] uniqueidentifier NOT NULL,
+        [BuildingId] uniqueidentifier NOT NULL,
+        [RoundNumber] nvarchar(50) NOT NULL,
+        [HarvestArea] nvarchar(max) NULL,
+        [StartedOn] date NOT NULL,
+        [HarvestedOn] date NOT NULL,
+        [TotalWeightKg] decimal(14,3) NOT NULL,
+        [NestCount] int NOT NULL,
+        [SampleCount] int NOT NULL,
+        [CollectorUserId] uniqueidentifier NULL,
+        [InspectorUserId] uniqueidentifier NULL,
+        [LaborCost] decimal(18,2) NOT NULL,
+        [EnvironmentNotes] nvarchar(max) NULL,
+        [Status] int NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_HarvestRounds] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_HarvestRounds_BirdBuildings_BuildingId] FOREIGN KEY ([BuildingId]) REFERENCES [BirdBuildings] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [Sales] (
+        [Id] uniqueidentifier NOT NULL,
+        [OwnerUserId] uniqueidentifier NOT NULL,
+        [DocumentNumber] nvarchar(50) NOT NULL,
+        [SaleDate] date NOT NULL,
+        [BuyerId] uniqueidentifier NOT NULL,
+        [Subtotal] decimal(18,2) NOT NULL,
+        [DiscountAmount] decimal(18,2) NOT NULL,
+        [ReturnAmount] decimal(18,2) NOT NULL,
+        [NetAmount] decimal(18,2) NOT NULL,
+        [PaidAmount] decimal(18,2) NOT NULL,
+        [PaymentMethod] nvarchar(max) NULL,
+        [PaymentStatus] int NOT NULL,
+        [DueDate] date NULL,
+        [Status] int NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_Sales] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Sales_Buyers_BuyerId] FOREIGN KEY ([BuyerId]) REFERENCES [Buyers] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [QualityBands] (
+        [Id] uniqueidentifier NOT NULL,
+        [QualityStandardId] uniqueidentifier NOT NULL,
+        [Name] nvarchar(max) NOT NULL,
+        [MinimumScore] decimal(18,2) NOT NULL,
+        [MaximumScore] decimal(18,2) NOT NULL,
+        [SortOrder] int NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_QualityBands] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_QualityBands_QualityStandards_QualityStandardId] FOREIGN KEY ([QualityStandardId]) REFERENCES [QualityStandards] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [QualityCriteria] (
+        [Id] uniqueidentifier NOT NULL,
+        [QualityStandardId] uniqueidentifier NOT NULL,
+        [Name] nvarchar(max) NOT NULL,
+        [MaxScore] decimal(18,2) NOT NULL,
+        [SortOrder] int NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_QualityCriteria] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_QualityCriteria_QualityStandards_QualityStandardId] FOREIGN KEY ([QualityStandardId]) REFERENCES [QualityStandards] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [StoredFiles] (
+        [Id] uniqueidentifier NOT NULL,
+        [BuildingId] uniqueidentifier NOT NULL,
+        [DailyLogId] uniqueidentifier NULL,
+        [HarvestRoundId] uniqueidentifier NULL,
+        [HarvestSampleId] uniqueidentifier NULL,
+        [MaintenanceJobId] uniqueidentifier NULL,
+        [SaleId] uniqueidentifier NULL,
+        [Kind] int NOT NULL,
+        [StorageKey] nvarchar(max) NOT NULL,
+        [OriginalFileName] nvarchar(max) NOT NULL,
+        [ContentType] nvarchar(max) NOT NULL,
+        [SizeBytes] bigint NOT NULL,
+        [Sha256] nvarchar(max) NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_StoredFiles] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_StoredFiles_DailyLogs_DailyLogId] FOREIGN KEY ([DailyLogId]) REFERENCES [DailyLogs] ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [HarvestItems] (
+        [Id] uniqueidentifier NOT NULL,
+        [HarvestRoundId] uniqueidentifier NOT NULL,
+        [NestTypeId] uniqueidentifier NOT NULL,
+        [GradeId] uniqueidentifier NULL,
+        [ColorId] uniqueidentifier NULL,
+        [NestSourceId] uniqueidentifier NULL,
+        [WeightKg] decimal(14,3) NOT NULL,
+        [RemainingWeightKg] decimal(14,3) NOT NULL,
+        [NestCount] int NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_HarvestItems] PRIMARY KEY ([Id]),
+        CONSTRAINT [CK_HarvestItems_Weight] CHECK ([WeightKg] >= 0 AND [RemainingWeightKg] >= 0 AND [RemainingWeightKg] <= [WeightKg]),
+        CONSTRAINT [FK_HarvestItems_HarvestRounds_HarvestRoundId] FOREIGN KEY ([HarvestRoundId]) REFERENCES [HarvestRounds] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [HarvestSamples] (
+        [Id] uniqueidentifier NOT NULL,
+        [HarvestRoundId] uniqueidentifier NOT NULL,
+        [SampleNumber] nvarchar(max) NOT NULL,
+        [WeightGrams] decimal(10,3) NULL,
+        [NestTypeId] uniqueidentifier NULL,
+        [GradeId] uniqueidentifier NULL,
+        [ColorId] uniqueidentifier NULL,
+        [NestSourceId] uniqueidentifier NULL,
+        [BellyConditionId] uniqueidentifier NULL,
+        [FeatherLevelId] uniqueidentifier NULL,
+        [CleanlinessLevelId] uniqueidentifier NULL,
+        [InspectorNotes] nvarchar(max) NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_HarvestSamples] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_HarvestSamples_HarvestRounds_HarvestRoundId] FOREIGN KEY ([HarvestRoundId]) REFERENCES [HarvestRounds] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [QualityScores] (
+        [Id] uniqueidentifier NOT NULL,
+        [HarvestRoundId] uniqueidentifier NOT NULL,
+        [QualityStandardId] uniqueidentifier NOT NULL,
+        [TotalScore] decimal(18,2) NOT NULL,
+        [ResultLabel] nvarchar(max) NOT NULL,
+        [ConfirmedByUserId] uniqueidentifier NOT NULL,
+        [ConfirmedAt] datetimeoffset NOT NULL,
+        [Explanation] nvarchar(max) NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_QualityScores] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_QualityScores_HarvestRounds_HarvestRoundId] FOREIGN KEY ([HarvestRoundId]) REFERENCES [HarvestRounds] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [SaleItems] (
+        [Id] uniqueidentifier NOT NULL,
+        [SaleId] uniqueidentifier NOT NULL,
+        [HarvestItemId] uniqueidentifier NOT NULL,
+        [WeightKg] decimal(14,3) NOT NULL,
+        [PricePerKg] decimal(18,2) NOT NULL,
+        [DiscountAmount] decimal(18,2) NOT NULL,
+        [NetAmount] decimal(18,2) NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_SaleItems] PRIMARY KEY ([Id]),
+        CONSTRAINT [CK_SaleItems_Weight] CHECK ([WeightKg] > 0),
+        CONSTRAINT [FK_SaleItems_HarvestItems_HarvestItemId] FOREIGN KEY ([HarvestItemId]) REFERENCES [HarvestItems] ([Id]) ON DELETE CASCADE,
+        CONSTRAINT [FK_SaleItems_Sales_SaleId] FOREIGN KEY ([SaleId]) REFERENCES [Sales] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE TABLE [SampleCharacteristics] (
+        [Id] uniqueidentifier NOT NULL,
+        [HarvestSampleId] uniqueidentifier NOT NULL,
+        [CharacteristicId] uniqueidentifier NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_SampleCharacteristics] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_SampleCharacteristics_HarvestSamples_HarvestSampleId] FOREIGN KEY ([HarvestSampleId]) REFERENCES [HarvestSamples] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_AspNetRoleClaims_RoleId] ON [AspNetRoleClaims] ([RoleId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [RoleNameIndex] ON [AspNetRoles] ([NormalizedName]) WHERE [NormalizedName] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_AspNetUserClaims_UserId] ON [AspNetUserClaims] ([UserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_AspNetUserLogins_UserId] ON [AspNetUserLogins] ([UserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_AspNetUserRoles_RoleId] ON [AspNetUserRoles] ([RoleId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [EmailIndex] ON [AspNetUsers] ([NormalizedEmail]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [UserNameIndex] ON [AspNetUsers] ([NormalizedUserName]) WHERE [NormalizedUserName] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_Assets_BuildingId] ON [Assets] ([BuildingId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_AuditLogs_OccurredAt] ON [AuditLogs] ([OccurredAt]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_BirdBuildings_OwnerUserId_Code] ON [BirdBuildings] ([OwnerUserId], [Code]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_BuildingUsers_BuildingId_UserId] ON [BuildingUsers] ([BuildingId], [UserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_DailyLogs_BuildingId] ON [DailyLogs] ([BuildingId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_HarvestItems_HarvestRoundId] ON [HarvestItems] ([HarvestRoundId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_HarvestRounds_BuildingId_RoundNumber] ON [HarvestRounds] ([BuildingId], [RoundNumber]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_HarvestSamples_HarvestRoundId] ON [HarvestSamples] ([HarvestRoundId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_MasterOptions_Category_Code] ON [MasterOptions] ([Category], [Code]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_QualityBands_QualityStandardId] ON [QualityBands] ([QualityStandardId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_QualityCriteria_QualityStandardId] ON [QualityCriteria] ([QualityStandardId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_QualityScores_HarvestRoundId] ON [QualityScores] ([HarvestRoundId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_QualityStandards_OwnerUserId_Name_Version] ON [QualityStandards] ([OwnerUserId], [Name], [Version]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_SaleItems_HarvestItemId] ON [SaleItems] ([HarvestItemId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_SaleItems_SaleId] ON [SaleItems] ([SaleId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_Sales_BuyerId] ON [Sales] ([BuyerId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Sales_OwnerUserId_DocumentNumber] ON [Sales] ([OwnerUserId], [DocumentNumber]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_SampleCharacteristics_HarvestSampleId] ON [SampleCharacteristics] ([HarvestSampleId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    CREATE INDEX [IX_StoredFiles_DailyLogId] ON [StoredFiles] ([DailyLogId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907032243_InitialCreate'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260907032243_InitialCreate', N'10.0.9');
+END;
+
+COMMIT;
+GO
+
