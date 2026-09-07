@@ -1,0 +1,26 @@
+@model Notenokand.Web.Models.Account.RegisterViewModel
+@{ ViewData["Title"] = "สมัครสมาชิก"; ViewData["BodyClass"] = "auth-page"; }
+<section class="auth-shell">
+  <div class="auth-intro d-none d-lg-flex">
+    <a class="brand brand-light" asp-controller="Home" asp-action="Index"><span class="brand-mark">N</span><span>NOTENOKAND</span></a>
+    <div><span class="hero-pill">เริ่มต้นได้ในไม่กี่นาที</span><h1>ทุกตัวเลขของกิจการ<br />อยู่ในที่เดียว</h1><p>จัดเก็บค่าใช้จ่าย ผลผลิต สต็อก และการขายอย่างเป็นระบบ พร้อมดูภาพรวมได้ทุกอุปกรณ์</p></div>
+    <div class="trust-note"><span>✓</span> ข้อมูลของแต่ละกิจการแยกจากกันอย่างชัดเจน</div>
+  </div>
+  <div class="auth-panel">
+    <div class="auth-card">
+      <a class="brand d-lg-none mb-4" asp-controller="Home" asp-action="Index"><span class="brand-mark">N</span><span>NOTENOKAND</span></a>
+      <div class="step-label">ขั้นตอนที่ 1 จาก 2</div><h2>สร้างบัญชีของคุณ</h2><p class="text-secondary">สมัครเพื่อเริ่มจัดการข้อมูลกิจการ</p>
+      <form asp-action="Register" method="post" class="mt-4" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <div class="form-field"><label asp-for="DisplayName"></label><input asp-for="DisplayName" class="form-control" autocomplete="name" placeholder="เช่น สมชาย ใจดี" /><span asp-validation-for="DisplayName"></span></div>
+        <div class="form-field"><label asp-for="Email"></label><input asp-for="Email" class="form-control" autocomplete="email" inputmode="email" placeholder="name@example.com" /><span asp-validation-for="Email"></span></div>
+        <div class="form-field"><label asp-for="PhoneNumber"></label><span class="optional">ไม่บังคับ</span><input asp-for="PhoneNumber" class="form-control" autocomplete="tel" inputmode="tel" placeholder="08x-xxx-xxxx" /><span asp-validation-for="PhoneNumber"></span></div>
+        <div class="row g-3"><div class="col-md-6 form-field"><label asp-for="Password"></label><div class="password-wrap"><input asp-for="Password" class="form-control" autocomplete="new-password" /><button type="button" class="password-toggle" aria-label="แสดงรหัสผ่าน">ดู</button></div><small>อย่างน้อย 10 ตัว มี A-Z, a-z, ตัวเลข และอักขระพิเศษ</small><span asp-validation-for="Password"></span></div><div class="col-md-6 form-field"><label asp-for="ConfirmPassword"></label><div class="password-wrap"><input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" /><button type="button" class="password-toggle" aria-label="แสดงรหัสผ่าน">ดู</button></div><span asp-validation-for="ConfirmPassword"></span></div></div>
+        <div class="form-check terms-check"><input asp-for="AcceptTerms" class="form-check-input" /><label asp-for="AcceptTerms" class="form-check-label">ฉันยอมรับ <a asp-controller="Home" asp-action="Terms" target="_blank">ข้อกำหนดการใช้งาน</a> และ <a asp-controller="Home" asp-action="Privacy" target="_blank">นโยบายความเป็นส่วนตัว</a></label><span asp-validation-for="AcceptTerms" class="d-block"></span></div>
+        <button class="btn btn-primary btn-lg w-100" type="submit">สร้างบัญชี <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="auth-switch">มีบัญชีแล้ว? <a asp-action="Login">เข้าสู่ระบบ</a></p>
+    </div>
+  </div>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

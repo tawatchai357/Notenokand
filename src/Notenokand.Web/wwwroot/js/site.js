@@ -1,4 +1,6 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+document.querySelectorAll('.password-toggle').forEach(button => button.addEventListener('click', () => {
+  const input = button.previousElementSibling;
+  input.type = input.type === 'password' ? 'text' : 'password';
+  button.textContent = input.type === 'password' ? 'ดู' : 'ซ่อน';
+}));
+if (window.notenokandAlert && window.Swal) Swal.fire({ icon: 'success', title: 'เรียบร้อย', text: window.notenokandAlert, confirmButtonText: 'ตกลง', confirmButtonColor: '#1565d8' });

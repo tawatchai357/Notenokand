@@ -5,6 +5,7 @@ namespace Notenokand.Domain.Entities;
 
 public sealed class BirdBuilding : Entity
 {
+    public Guid AccountId { get; set; }
     public required Guid OwnerUserId { get; set; }
     public required string Code { get; set; }
     public required string Name { get; set; }

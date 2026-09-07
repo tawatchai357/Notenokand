@@ -1,26 +1,2 @@
-﻿@{
-    ViewData["Title"] = "ภาพรวม";
-}
-
-<section class="hero">
-    <p class="eyebrow">ระบบบริหารตึกนก</p>
-    <h1>เห็นผลผลิต คุณภาพ และต้นทุนในภาพเดียว</h1>
-    <p class="lead">Notenokand เชื่อมข้อมูลประจำวัน รอบเก็บผลผลิต สต็อก การขาย ค่าใช้จ่าย และงานซ่อม เพื่อให้ตัดสินใจจากข้อมูลที่ตรวจสอบย้อนกลับได้</p>
-</section>
-
-<section class="metric-grid" aria-label="ตัวชี้วัดภาพรวม">
-    <article class="metric-card"><span>ผลผลิตปีนี้</span><strong>— กก.</strong><small>รอข้อมูลรอบเก็บผลผลิต</small></article>
-    <article class="metric-card"><span>ยอดขายสุทธิ</span><strong>— บาท</strong><small>แยกรับชำระและลูกหนี้</small></article>
-    <article class="metric-card"><span>สต็อกคงเหลือ</span><strong>— กก.</strong><small>คำนวณราย Lot</small></article>
-    <article class="metric-card"><span>คุณภาพรัง</span><strong>— คะแนน</strong><small>ค่าเฉลี่ยเคลื่อนที่ 3 รอบ</small></article>
-</section>
-
-<section class="quick-actions">
-    <h2>เริ่มบันทึก</h2>
-    <div class="action-grid">
-        <a href="#">สมุดประจำวัน</a>
-        <a href="#">รอบเก็บผลผลิต</a>
-        <a href="#">การขาย</a>
-        <a href="#">รายรับและค่าใช้จ่าย</a>
-    </div>
-</section>
+@{ ViewData["Title"] = "ระบบจัดการกิจการบ้านนกแอ่น"; }
+<section class="landing-hero"><div class="landing-copy"><span class="hero-pill">ระบบจัดการกิจการบ้านนกแอ่น</span><h1>เข้าใจ<span>ทุกต้นทุน</span><br />เห็นทุกการเติบโต</h1><p>บันทึกค่าใช้จ่าย ผลผลิต สต็อก และยอดขายไว้ในที่เดียว เปลี่ยนข้อมูลประจำวันให้เป็นภาพรวมที่ช่วยตัดสินใจ</p><div class="hero-actions"><a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="Register">เริ่มใช้งานฟรี <span>→</span></a><a class="btn btn-soft btn-lg" href="#features">ดูความสามารถ</a></div><div class="hero-assurance"><span>✓ ไม่ต้องติดตั้ง</span><span>✓ ใช้งานได้ทุกอุปกรณ์</span><span>✓ ข้อมูลแยกตามกิจการ</span></div></div><div class="hero-visual" aria-label="ตัวอย่าง Dashboard"><div class="preview-window"><div class="preview-top"><b><span class="brand-mark small">N</span> NOTENOKAND</b><i></i></div><div class="preview-body"><div class="preview-welcome"><div><small>สวัสดี</small><strong>ภาพรวมกิจการวันนี้</strong></div><span>+ บันทึก</span></div><div class="preview-cards"><div><small>ค่าใช้จ่ายเดือนนี้</small><b>฿24,850</b><em>↓ 8.4%</em></div><div><small>รายรับเดือนนี้</small><b>฿86,500</b><em>↑ 12.5%</em></div></div><div class="preview-chart"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div><div class="floating-card"><span>✓</span><div><small>บันทึกสำเร็จ</small><b>ค่าแรงคัดรัง ฿2,400</b></div></div></div></section><section id="features" class="feature-section"><div class="section-intro"><span class="eyebrow">ทำงานง่ายขึ้น</span><h2>ข้อมูลที่ต้องใช้<br />จัดวางอย่างเป็นระบบ</h2></div><div class="feature-grid"><article><span>◫</span><h3>รายรับและค่าใช้จ่าย</h3><p>บันทึกรายการ แยกหมวดหมู่ และเห็นต้นทุนจริงของแต่ละช่วงเวลา</p></article><article><span>◇</span><h3>ผลผลิตและสต็อก</h3><p>ติดตามรอบเก็บ Lot และน้ำหนักคงเหลือที่ตรวจสอบย้อนกลับได้</p></article><article><span>⌂</span><h3>หลายตึกในบัญชีเดียว</h3><p>ดูข้อมูลแยกแต่ละตึก พร้อมภาพรวมของทั้งกิจการ</p></article></div></section>

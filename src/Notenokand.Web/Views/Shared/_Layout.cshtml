@@ -1,50 +1,22 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+@using System.Text.Json
+<!DOCTYPE html>
+<html lang="th">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Notenokand</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Notenokand.Web.styles.css" asp-append-version="true" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>@ViewData["Title"] - Notenokand</title>
+  <meta name="description" content="ระบบจัดการค่าใช้จ่าย ผลผลิต สต็อก และยอดขายสำหรับกิจการบ้านนกแอ่น" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /><link rel="stylesheet" href="~/Notenokand.Web.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">NOTENOKAND</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">ภาพรวม</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="#">ตึกนก</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 Notenokand
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
-</html>
+<body class="@ViewData["BodyClass"]">
+@if (!(ViewData["BodyClass"]?.ToString()?.Contains("auth-page") ?? false) && !(ViewData["BodyClass"]?.ToString()?.Contains("onboarding-page") ?? false)) {
+<header class="site-header"><nav class="container nav-shell"><a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">N</span><span>NOTENOKAND</span></a><div class="nav-links d-none d-md-flex"><a href="/#features">ความสามารถ</a><a href="#">เกี่ยวกับเรา</a></div><div class="nav-actions">@if (User.Identity?.IsAuthenticated == true) { <a class="btn btn-soft d-none d-sm-inline-flex" asp-controller="Dashboard" asp-action="Index">ภาพรวม</a><form asp-controller="Account" asp-action="Logout" method="post"><button class="btn btn-link" type="submit">ออกจากระบบ</button></form> } else { <a class="login-link" asp-controller="Account" asp-action="Login">เข้าสู่ระบบ</a><a class="btn btn-primary" asp-controller="Account" asp-action="Register">เริ่มใช้งาน</a> }</div></nav></header>
+}
+<main role="main" class="@(ViewData["BodyClass"] == null ? "container app-main" : "")">@RenderBody()</main>
+@if (ViewData["BodyClass"] == null) { <footer class="site-footer"><div class="container"><a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">N</span><span>NOTENOKAND</span></a><div><a asp-controller="Home" asp-action="Terms">ข้อกำหนด</a><a asp-controller="Home" asp-action="Privacy">ความเป็นส่วนตัว</a><span>© 2026 Notenokand</span></div></div></footer> }
+<script src="~/lib/jquery/dist/jquery.min.js"></script><script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><script src="~/js/site.js" asp-append-version="true"></script>
+@if (TempData["SuccessMessage"] is string successMessage) { <script>window.notenokandAlert = @Html.Raw(JsonSerializer.Serialize(successMessage));</script> }
+@await RenderSectionAsync("Scripts", required: false)
+</body></html>

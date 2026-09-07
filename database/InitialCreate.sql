@@ -1063,3 +1063,354 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    DROP INDEX [IX_BirdBuildings_OwnerUserId_Code] ON [BirdBuildings];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [AccountId] uniqueidentifier NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE TABLE [AccountInvitations] (
+        [Id] uniqueidentifier NOT NULL,
+        [AccountId] uniqueidentifier NOT NULL,
+        [Email] nvarchar(256) NOT NULL,
+        [RoleName] nvarchar(50) NOT NULL,
+        [TokenHash] nvarchar(128) NOT NULL,
+        [ExpiresAt] datetimeoffset NOT NULL,
+        [AcceptedAt] datetimeoffset NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_AccountInvitations] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE TABLE [Accounts] (
+        [Id] uniqueidentifier NOT NULL,
+        [Name] nvarchar(200) NOT NULL,
+        [BusinessType] nvarchar(100) NULL,
+        [TaxId] nvarchar(20) NULL,
+        [AddressLine] nvarchar(500) NULL,
+        [ProvinceCode] smallint NULL,
+        [DistrictCode] int NULL,
+        [SubdistrictCode] int NULL,
+        [PostalCode] char(5) NULL,
+        [TimeZoneId] nvarchar(100) NOT NULL,
+        [CurrencyCode] char(3) NOT NULL,
+        [IsActive] bit NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_Accounts] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Accounts_ThaiDistricts_DistrictCode] FOREIGN KEY ([DistrictCode]) REFERENCES [ThaiDistricts] ([Code]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_Accounts_ThaiProvinces_ProvinceCode] FOREIGN KEY ([ProvinceCode]) REFERENCES [ThaiProvinces] ([Code]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_Accounts_ThaiSubdistricts_SubdistrictCode] FOREIGN KEY ([SubdistrictCode]) REFERENCES [ThaiSubdistricts] ([Code]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE TABLE [EmailVerificationLogs] (
+        [Id] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [RequestedAt] datetimeoffset NOT NULL,
+        [ConfirmedAt] datetimeoffset NULL,
+        [IpAddress] nvarchar(64) NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_EmailVerificationLogs] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE TABLE [UserConsents] (
+        [Id] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [ConsentType] nvarchar(50) NOT NULL,
+        [Version] nvarchar(30) NOT NULL,
+        [AcceptedAt] datetimeoffset NOT NULL,
+        [IpAddress] nvarchar(64) NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_UserConsents] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE TABLE [AccountUsers] (
+        [Id] uniqueidentifier NOT NULL,
+        [AccountId] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [RoleName] nvarchar(50) NOT NULL,
+        [IsActive] bit NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_AccountUsers] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_AccountUsers_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_BirdBuildings_AccountId_Code] ON [BirdBuildings] ([AccountId], [Code]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE INDEX [IX_AccountInvitations_AccountId_Email] ON [AccountInvitations] ([AccountId], [Email]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE INDEX [IX_Accounts_DistrictCode] ON [Accounts] ([DistrictCode]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE INDEX [IX_Accounts_ProvinceCode] ON [Accounts] ([ProvinceCode]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE INDEX [IX_Accounts_SubdistrictCode] ON [Accounts] ([SubdistrictCode]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_AccountUsers_AccountId_UserId] ON [AccountUsers] ([AccountId], [UserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE INDEX [IX_EmailVerificationLogs_UserId_RequestedAt] ON [EmailVerificationLogs] ([UserId], [RequestedAt]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_UserConsents_UserId_ConsentType_Version] ON [UserConsents] ([UserId], [ConsentType], [Version]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD CONSTRAINT [FK_BirdBuildings_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts] ([Id]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041323_AddAccountOnboarding'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260907041323_AddAccountOnboarding', N'10.0.9');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041410_AddAccountForeignKeys'
+)
+BEGIN
+    CREATE INDEX [IX_AccountUsers_UserId] ON [AccountUsers] ([UserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041410_AddAccountForeignKeys'
+)
+BEGIN
+    ALTER TABLE [AccountInvitations] ADD CONSTRAINT [FK_AccountInvitations_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts] ([Id]) ON DELETE CASCADE;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041410_AddAccountForeignKeys'
+)
+BEGIN
+    ALTER TABLE [AccountUsers] ADD CONSTRAINT [FK_AccountUsers_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041410_AddAccountForeignKeys'
+)
+BEGIN
+    ALTER TABLE [EmailVerificationLogs] ADD CONSTRAINT [FK_EmailVerificationLogs_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041410_AddAccountForeignKeys'
+)
+BEGIN
+    ALTER TABLE [UserConsents] ADD CONSTRAINT [FK_UserConsents_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041410_AddAccountForeignKeys'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260907041410_AddAccountForeignKeys', N'10.0.9');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041713_SetFinancialAndQualityPrecision'
+)
+BEGIN
+    DECLARE @var4 nvarchar(max);
+    SELECT @var4 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[QualityScores]') AND [c].[name] = N'TotalScore');
+    IF @var4 IS NOT NULL EXEC(N'ALTER TABLE [QualityScores] DROP CONSTRAINT ' + @var4 + ';');
+    ALTER TABLE [QualityScores] ALTER COLUMN [TotalScore] decimal(9,3) NOT NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041713_SetFinancialAndQualityPrecision'
+)
+BEGIN
+    DECLARE @var5 nvarchar(max);
+    SELECT @var5 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[QualityCriteria]') AND [c].[name] = N'MaxScore');
+    IF @var5 IS NOT NULL EXEC(N'ALTER TABLE [QualityCriteria] DROP CONSTRAINT ' + @var5 + ';');
+    ALTER TABLE [QualityCriteria] ALTER COLUMN [MaxScore] decimal(9,3) NOT NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041713_SetFinancialAndQualityPrecision'
+)
+BEGIN
+    DECLARE @var6 nvarchar(max);
+    SELECT @var6 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[QualityBands]') AND [c].[name] = N'MinimumScore');
+    IF @var6 IS NOT NULL EXEC(N'ALTER TABLE [QualityBands] DROP CONSTRAINT ' + @var6 + ';');
+    ALTER TABLE [QualityBands] ALTER COLUMN [MinimumScore] decimal(9,3) NOT NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041713_SetFinancialAndQualityPrecision'
+)
+BEGIN
+    DECLARE @var7 nvarchar(max);
+    SELECT @var7 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[QualityBands]') AND [c].[name] = N'MaximumScore');
+    IF @var7 IS NOT NULL EXEC(N'ALTER TABLE [QualityBands] DROP CONSTRAINT ' + @var7 + ';');
+    ALTER TABLE [QualityBands] ALTER COLUMN [MaximumScore] decimal(9,3) NOT NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041713_SetFinancialAndQualityPrecision'
+)
+BEGIN
+    DECLARE @var8 nvarchar(max);
+    SELECT @var8 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[MaintenanceJobs]') AND [c].[name] = N'DowntimeHours');
+    IF @var8 IS NOT NULL EXEC(N'ALTER TABLE [MaintenanceJobs] DROP CONSTRAINT ' + @var8 + ';');
+    ALTER TABLE [MaintenanceJobs] ALTER COLUMN [DowntimeHours] decimal(10,2) NOT NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907041713_SetFinancialAndQualityPrecision'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260907041713_SetFinancialAndQualityPrecision', N'10.0.9');
+END;
+
+COMMIT;
+GO
+

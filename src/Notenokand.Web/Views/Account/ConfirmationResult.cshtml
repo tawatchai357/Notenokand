@@ -1,0 +1,3 @@
+@model bool
+@{ ViewData["Title"] = Model ? "ยืนยันอีเมลสำเร็จ" : "ยืนยันอีเมลไม่สำเร็จ"; ViewData["BodyClass"] = "auth-page simple-auth"; }
+<section class="center-card"><div class="status-icon @(Model ? "success" : "danger")">@(Model ? "✓" : "!")</div><h1>@(Model ? "ยืนยันอีเมลสำเร็จ" : "ลิงก์ไม่ถูกต้องหรือหมดอายุ")</h1><p>@(Model ? "บัญชีพร้อมใช้งานแล้ว ขั้นต่อไปตั้งค่าข้อมูลกิจการของคุณ" : "กรุณาเข้าสู่ระบบหรือขอลิงก์ยืนยันใหม่")</p><a class="btn btn-primary btn-lg w-100" href="@(Model ? "/onboarding" : "/account/login")">@(Model ? "ตั้งค่ากิจการ" : "ไปหน้าเข้าสู่ระบบ") <span>→</span></a></section>

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Notenokand.Domain.Entities;
+using Notenokand.Infrastructure.Identity;
 
 namespace Notenokand.Infrastructure.Persistence;
 
@@ -8,12 +9,13 @@ public sealed class BirdBuildingConfiguration : IEntityTypeConfiguration<BirdBui
 {
     public void Configure(EntityTypeBuilder<BirdBuilding> b)
     {
-        b.HasIndex(x => new { x.OwnerUserId, x.Code }).IsUnique();
+        b.HasIndex(x => new { x.AccountId, x.Code }).IsUnique();
         b.Property(x => x.Code).HasMaxLength(30);
         b.Property(x => x.Name).HasMaxLength(200);
         b.Property(x => x.Latitude).HasPrecision(10, 7);
         b.Property(x => x.Longitude).HasPrecision(10, 7);
         b.Property(x => x.AreaSquareMeters).HasPrecision(12, 2);
+        b.HasOne<Account>().WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Restrict);
     }
 }
 
@@ -158,4 +160,93 @@ public sealed class ThaiSubdistrictPostalCodeConfiguration : IEntityTypeConfigur
         b.HasOne(x => x.Subdistrict).WithMany(x => x.PostalCodes).HasForeignKey(x => x.SubdistrictCode).OnDelete(DeleteBehavior.Cascade);
         b.HasIndex(x => x.PostalCode);
     }
+}
+public sealed class AccountConfiguration : IEntityTypeConfiguration<Account>
+{
+    public void Configure(EntityTypeBuilder<Account> b)
+    {
+        b.Property(x => x.Name).HasMaxLength(200);
+        b.Property(x => x.BusinessType).HasMaxLength(100);
+        b.Property(x => x.TaxId).HasMaxLength(20);
+        b.Property(x => x.AddressLine).HasMaxLength(500);
+        b.Property(x => x.PostalCode).HasColumnType("char(5)");
+        b.Property(x => x.TimeZoneId).HasMaxLength(100);
+        b.Property(x => x.CurrencyCode).HasColumnType("char(3)");
+        b.HasOne<ThaiProvince>().WithMany().HasForeignKey(x => x.ProvinceCode).OnDelete(DeleteBehavior.Restrict);
+        b.HasOne<ThaiDistrict>().WithMany().HasForeignKey(x => x.DistrictCode).OnDelete(DeleteBehavior.Restrict);
+        b.HasOne<ThaiSubdistrict>().WithMany().HasForeignKey(x => x.SubdistrictCode).OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+public sealed class AccountUserConfiguration : IEntityTypeConfiguration<AccountUser>
+{
+    public void Configure(EntityTypeBuilder<AccountUser> b)
+    {
+        b.Property(x => x.RoleName).HasMaxLength(50);
+        b.HasIndex(x => new { x.AccountId, x.UserId }).IsUnique();
+        b.HasOne(x => x.Account).WithMany(x => x.Members).HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Cascade);
+        b.HasOne<ApplicationUser>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public sealed class AccountInvitationConfiguration : IEntityTypeConfiguration<AccountInvitation>
+{
+    public void Configure(EntityTypeBuilder<AccountInvitation> b)
+    {
+        b.Property(x => x.Email).HasMaxLength(256);
+        b.Property(x => x.RoleName).HasMaxLength(50);
+        b.Property(x => x.TokenHash).HasMaxLength(128);
+        b.HasIndex(x => new { x.AccountId, x.Email });
+        b.HasOne<Account>().WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public sealed class UserConsentConfiguration : IEntityTypeConfiguration<UserConsent>
+{
+    public void Configure(EntityTypeBuilder<UserConsent> b)
+    {
+        b.Property(x => x.ConsentType).HasMaxLength(50);
+        b.Property(x => x.Version).HasMaxLength(30);
+        b.Property(x => x.IpAddress).HasMaxLength(64);
+        b.HasIndex(x => new { x.UserId, x.ConsentType, x.Version }).IsUnique();
+        b.HasOne<ApplicationUser>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public sealed class EmailVerificationLogConfiguration : IEntityTypeConfiguration<EmailVerificationLog>
+{
+    public void Configure(EntityTypeBuilder<EmailVerificationLog> b)
+    {
+        b.Property(x => x.IpAddress).HasMaxLength(64);
+        b.HasIndex(x => new { x.UserId, x.RequestedAt });
+        b.HasOne<ApplicationUser>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+    }
+}
+public sealed class MaintenanceJobConfiguration : IEntityTypeConfiguration<MaintenanceJob>
+{
+    public void Configure(EntityTypeBuilder<MaintenanceJob> b)
+    {
+        b.Property(x => x.PartsCost).HasPrecision(18, 2);
+        b.Property(x => x.LaborCost).HasPrecision(18, 2);
+        b.Property(x => x.DowntimeHours).HasPrecision(10, 2);
+    }
+}
+
+public sealed class QualityCriterionConfiguration : IEntityTypeConfiguration<QualityCriterion>
+{
+    public void Configure(EntityTypeBuilder<QualityCriterion> b) => b.Property(x => x.MaxScore).HasPrecision(9, 3);
+}
+
+public sealed class QualityBandConfiguration : IEntityTypeConfiguration<QualityBand>
+{
+    public void Configure(EntityTypeBuilder<QualityBand> b)
+    {
+        b.Property(x => x.MinimumScore).HasPrecision(9, 3);
+        b.Property(x => x.MaximumScore).HasPrecision(9, 3);
+    }
+}
+
+public sealed class QualityScoreConfiguration : IEntityTypeConfiguration<QualityScore>
+{
+    public void Configure(EntityTypeBuilder<QualityScore> b) => b.Property(x => x.TotalScore).HasPrecision(9, 3);
 }

@@ -30,6 +30,11 @@ public sealed class NotenokandDbContext(DbContextOptions<NotenokandDbContext> op
     public DbSet<QualityBand> QualityBands => Set<QualityBand>();
     public DbSet<QualityScore> QualityScores => Set<QualityScore>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<AccountUser> AccountUsers => Set<AccountUser>();
+    public DbSet<AccountInvitation> AccountInvitations => Set<AccountInvitation>();
+    public DbSet<UserConsent> UserConsents => Set<UserConsent>();
+    public DbSet<EmailVerificationLog> EmailVerificationLogs => Set<EmailVerificationLog>();
     public DbSet<ThaiProvince> ThaiProvinces => Set<ThaiProvince>();
     public DbSet<ThaiDistrict> ThaiDistricts => Set<ThaiDistrict>();
     public DbSet<ThaiSubdistrict> ThaiSubdistricts => Set<ThaiSubdistrict>();

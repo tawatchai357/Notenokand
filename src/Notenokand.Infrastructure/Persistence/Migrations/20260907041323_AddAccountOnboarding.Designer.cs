@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Notenokand.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Notenokand.Infrastructure.Persistence;
 namespace Notenokand.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(NotenokandDbContext))]
-    partial class NotenokandDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260907041323_AddAccountOnboarding")]
+    partial class AddAccountOnboarding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -321,8 +324,6 @@ namespace Notenokand.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.HasIndex("AccountId", "UserId")
                         .IsUnique();
@@ -1011,8 +1012,7 @@ namespace Notenokand.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("DowntimeHours")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1022,14 +1022,12 @@ namespace Notenokand.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("LaborCost")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateOnly?>("NextInspectionOn")
                         .HasColumnType("date");
 
                     b.Property<decimal>("PartsCost")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Priority")
@@ -1126,12 +1124,10 @@ namespace Notenokand.Infrastructure.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("MaximumScore")
-                        .HasPrecision(9, 3)
-                        .HasColumnType("decimal(9,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("MinimumScore")
-                        .HasPrecision(9, 3)
-                        .HasColumnType("decimal(9,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1173,8 +1169,7 @@ namespace Notenokand.Infrastructure.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("MaxScore")
-                        .HasPrecision(9, 3)
-                        .HasColumnType("decimal(9,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1235,8 +1230,7 @@ namespace Notenokand.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalScore")
-                        .HasPrecision(9, 3)
-                        .HasColumnType("decimal(9,3)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
@@ -1828,26 +1822,11 @@ namespace Notenokand.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Notenokand.Domain.Entities.AccountInvitation", b =>
-                {
-                    b.HasOne("Notenokand.Domain.Entities.Account", null)
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Notenokand.Domain.Entities.AccountUser", b =>
                 {
                     b.HasOne("Notenokand.Domain.Entities.Account", "Account")
                         .WithMany("Members")
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Notenokand.Infrastructure.Identity.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1894,15 +1873,6 @@ namespace Notenokand.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Building");
-                });
-
-            modelBuilder.Entity("Notenokand.Domain.Entities.EmailVerificationLog", b =>
-                {
-                    b.HasOne("Notenokand.Infrastructure.Identity.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Notenokand.Domain.Entities.HarvestItem", b =>
@@ -2050,15 +2020,6 @@ namespace Notenokand.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Subdistrict");
-                });
-
-            modelBuilder.Entity("Notenokand.Domain.Entities.UserConsent", b =>
-                {
-                    b.HasOne("Notenokand.Infrastructure.Identity.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Notenokand.Domain.Entities.Account", b =>

@@ -1,0 +1,12 @@
+(() => {
+ const form=document.querySelector('[data-address-form]'); if(!form) return;
+ const province=form.querySelector('[data-province]'), district=form.querySelector('[data-district]'), subdistrict=form.querySelector('[data-subdistrict]'), postal=form.querySelector('[data-postal]');
+ const fill=(select,items,placeholder,selected)=>{select.innerHTML=`<option value="">${placeholder}</option>`+items.map(x=>`<option value="${x.code}" ${String(x.code)===String(selected)?'selected':''}>${x.name}</option>`).join(''); select.disabled=false;};
+ const clear=(select,label)=>{select.innerHTML=`<option value="">${label}</option>`; select.disabled=true;};
+ async function load(url){const response=await fetch(url,{headers:{Accept:'application/json'}}); if(!response.ok) throw new Error('โหลดข้อมูลที่อยู่ไม่สำเร็จ'); return response.json();}
+ async function onProvince(selectedDistrict){clear(district,'กำลังโหลด...'); clear(subdistrict,'เลือกตำบล/แขวง'); clear(postal,'รหัสไปรษณีย์'); if(!province.value){clear(district,'เลือกอำเภอ/เขต');return;} try{fill(district,await load(`/api/locations/districts?provinceCode=${province.value}`),'เลือกอำเภอ/เขต',selectedDistrict);}catch{clear(district,'ลองใหม่อีกครั้ง');}}
+ async function onDistrict(selectedSubdistrict){clear(subdistrict,'กำลังโหลด...'); clear(postal,'รหัสไปรษณีย์'); if(!district.value){clear(subdistrict,'เลือกตำบล/แขวง');return;} try{fill(subdistrict,await load(`/api/locations/subdistricts?districtCode=${district.value}`),'เลือกตำบล/แขวง',selectedSubdistrict);}catch{clear(subdistrict,'ลองใหม่อีกครั้ง');}}
+ async function onSubdistrict(selectedPostal){clear(postal,'กำลังโหลด...'); if(!subdistrict.value){clear(postal,'รหัสไปรษณีย์');return;} try{const items=await load(`/api/locations/postal-codes?subdistrictCode=${subdistrict.value}`); fill(postal,items.map(x=>({code:x,name:x})),'รหัสไปรษณีย์',selectedPostal); if(items.length===1) postal.value=items[0];}catch{clear(postal,'ลองใหม่อีกครั้ง');}}
+ province.addEventListener('change',()=>onProvince()); district.addEventListener('change',()=>onDistrict()); subdistrict.addEventListener('change',()=>onSubdistrict());
+ (async()=>{const d=district.dataset.selected,s=subdistrict.dataset.selected,p=postal.dataset.selected;if(province.value){await onProvince(d);if(d){await onDistrict(s);if(s)await onSubdistrict(p);}}})();
+})();
