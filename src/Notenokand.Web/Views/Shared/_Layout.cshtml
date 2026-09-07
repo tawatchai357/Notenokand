@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
   <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /><link rel="stylesheet" href="~/Notenokand.Web.styles.css" asp-append-version="true" />
+  @await RenderSectionAsync("Head", required: false)
 </head>
 <body class="@ViewData["BodyClass"]">
 @if (!(ViewData["BodyClass"]?.ToString()?.Contains("auth-page") ?? false) && !(ViewData["BodyClass"]?.ToString()?.Contains("onboarding-page") ?? false)) {

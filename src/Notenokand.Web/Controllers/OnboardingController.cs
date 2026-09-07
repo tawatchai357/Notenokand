@@ -87,6 +87,10 @@ public sealed class OnboardingController(
                 Name = model.BuildingName.Trim(),
                 Province = province.NameTh,
                 Address = model.AddressLine?.Trim(),
+                ProvinceCode = model.ProvinceCode,
+                DistrictCode = model.DistrictCode,
+                SubdistrictCode = model.SubdistrictCode,
+                PostalCode = model.PostalCode,
                 CreatedByUserId = userId
             });
         }

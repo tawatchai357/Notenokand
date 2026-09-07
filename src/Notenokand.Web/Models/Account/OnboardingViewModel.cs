@@ -51,4 +51,5 @@ public sealed class DashboardViewModel
     public required string AccountName { get; init; }
     public int BuildingCount { get; init; }
     public string DisplayName { get; init; } = string.Empty;
+    public IReadOnlyList<Notenokand.Web.Models.Buildings.BuildingCardViewModel> Buildings { get; init; } = [];
 }

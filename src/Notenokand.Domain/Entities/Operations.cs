@@ -11,6 +11,10 @@ public sealed class BirdBuilding : Entity
     public required string Name { get; set; }
     public string? Province { get; set; }
     public string? Address { get; set; }
+    public short? ProvinceCode { get; set; }
+    public int? DistrictCode { get; set; }
+    public int? SubdistrictCode { get; set; }
+    public string? PostalCode { get; set; }
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
     public DateOnly? StartedOn { get; set; }

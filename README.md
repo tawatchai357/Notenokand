@@ -7,7 +7,9 @@
 - หน้า Landing, สมัครสมาชิก, ยืนยันอีเมล, เข้าสู่ระบบ และออกจากระบบ
 - Onboarding สร้างบัญชีกิจการและตึกนกแห่งแรก
 - Dropdown ที่อยู่ไทยแบบ จังหวัด → อำเภอ/เขต → ตำบล/แขวง → รหัสไปรษณีย์
-- Dashboard เริ่มต้นแบบ responsive สำหรับมือถือ แท็บเล็ต และ PC
+- Dashboard แสดงตึกนกแบบ Card View พร้อมกรองสถานะ แก้ไข และเปิด/ปิดการใช้งาน
+- เพิ่มและแก้ไขตึกพร้อมที่อยู่ไทย พิกัด และแผนที่ OpenStreetMap
+- Dashboard แบบ responsive สำหรับมือถือ แท็บเล็ต และ PC
 - ASP.NET Core Identity พร้อมยืนยันอีเมล, lockout, anti-forgery และ rate limit แยกตาม IP
 - SQL Server schema และ idempotent migration script
 

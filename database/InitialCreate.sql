@@ -1414,3 +1414,127 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907075520_AddBuildingAddressLocation'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [DistrictCode] int NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907075520_AddBuildingAddressLocation'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [PostalCode] char(5) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907075520_AddBuildingAddressLocation'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [ProvinceCode] smallint NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907075520_AddBuildingAddressLocation'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [SubdistrictCode] int NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907075520_AddBuildingAddressLocation'
+)
+BEGIN
+    CREATE INDEX [IX_BirdBuildings_DistrictCode] ON [BirdBuildings] ([DistrictCode]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907075520_AddBuildingAddressLocation'
+)
+BEGIN
+    CREATE INDEX [IX_BirdBuildings_ProvinceCode] ON [BirdBuildings] ([ProvinceCode]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907075520_AddBuildingAddressLocation'
+)
+BEGIN
+    CREATE INDEX [IX_BirdBuildings_SubdistrictCode] ON [BirdBuildings] ([SubdistrictCode]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907075520_AddBuildingAddressLocation'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD CONSTRAINT [FK_BirdBuildings_ThaiDistricts_DistrictCode] FOREIGN KEY ([DistrictCode]) REFERENCES [ThaiDistricts] ([Code]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907075520_AddBuildingAddressLocation'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD CONSTRAINT [FK_BirdBuildings_ThaiProvinces_ProvinceCode] FOREIGN KEY ([ProvinceCode]) REFERENCES [ThaiProvinces] ([Code]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907075520_AddBuildingAddressLocation'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD CONSTRAINT [FK_BirdBuildings_ThaiSubdistricts_SubdistrictCode] FOREIGN KEY ([SubdistrictCode]) REFERENCES [ThaiSubdistricts] ([Code]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907075520_AddBuildingAddressLocation'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260907075520_AddBuildingAddressLocation', N'10.0.9');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907080038_BackfillBuildingAddressFromAccount'
+)
+BEGIN
+    UPDATE building
+    SET ProvinceCode = COALESCE(building.ProvinceCode, accountRow.ProvinceCode),
+        DistrictCode = COALESCE(building.DistrictCode, accountRow.DistrictCode),
+        SubdistrictCode = COALESCE(building.SubdistrictCode, accountRow.SubdistrictCode),
+        PostalCode = COALESCE(building.PostalCode, accountRow.PostalCode)
+    FROM BirdBuildings AS building
+    INNER JOIN Accounts AS accountRow ON accountRow.Id = building.AccountId
+    WHERE building.ProvinceCode IS NULL
+       OR building.DistrictCode IS NULL
+       OR building.SubdistrictCode IS NULL
+       OR building.PostalCode IS NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260907080038_BackfillBuildingAddressFromAccount'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260907080038_BackfillBuildingAddressFromAccount', N'10.0.9');
+END;
+
+COMMIT;
+GO
+
