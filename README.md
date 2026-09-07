@@ -21,7 +21,7 @@
 ```json
 {
   "ConnectionStrings": {
-    "Notenokand": "Server=.\\SQLEXPRESS;Database=notenokand;Trusted_Connection=True;TrustServerCertificate=True"
+    "Notenokand": "Server=.\\SQL2016;Database=notenokand;Trusted_Connection=True;TrustServerCertificate=True"
   }
 }
 ```

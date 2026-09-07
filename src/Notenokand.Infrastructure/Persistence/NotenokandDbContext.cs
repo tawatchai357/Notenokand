@@ -34,6 +34,19 @@ public sealed class NotenokandDbContext(DbContextOptions<NotenokandDbContext> op
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        // Keep ASP.NET Identity composite keys below SQL Server's 900-byte clustered-index limit.
+        builder.Entity<IdentityUserLogin<Guid>>(entity =>
+        {
+            entity.Property(x => x.LoginProvider).HasMaxLength(128);
+            entity.Property(x => x.ProviderKey).HasMaxLength(128);
+        });
+        builder.Entity<IdentityUserToken<Guid>>(entity =>
+        {
+            entity.Property(x => x.LoginProvider).HasMaxLength(128);
+            entity.Property(x => x.Name).HasMaxLength(128);
+        });
+
         builder.ApplyConfigurationsFromAssembly(typeof(NotenokandDbContext).Assembly);
 
         foreach (var entityType in builder.Model.GetEntityTypes()

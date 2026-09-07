@@ -8,7 +8,7 @@ public sealed class NotenokandDesignTimeDbContextFactory : IDesignTimeDbContextF
     public NotenokandDbContext CreateDbContext(string[] args)
     {
         var options = new DbContextOptionsBuilder<NotenokandDbContext>()
-            .UseSqlServer("Server=.\\SQLEXPRESS;Database=notenokand;Trusted_Connection=True;TrustServerCertificate=True")
+            .UseSqlServer("Server=.\\SQL2016;Database=notenokand;Trusted_Connection=True;TrustServerCertificate=True")
             .Options;
 
         return new NotenokandDbContext(options);
