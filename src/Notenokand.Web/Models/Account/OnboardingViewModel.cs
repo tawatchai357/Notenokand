@@ -43,6 +43,9 @@ public sealed class OnboardingViewModel
     [Display(Name = "ชื่อตึกนกแห่งแรก (ไม่บังคับ)")]
     public string? BuildingName { get; set; }
 
+    [Display(Name = "รูปตึกนก (ไม่บังคับ)")]
+    public IFormFile? BuildingPhoto { get; set; }
+
     public IReadOnlyList<SelectListItem> Provinces { get; set; } = [];
 }
 

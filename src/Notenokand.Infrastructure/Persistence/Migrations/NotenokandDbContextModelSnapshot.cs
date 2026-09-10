@@ -452,6 +452,25 @@ namespace Notenokand.Infrastructure.Persistence.Migrations
                     b.Property<decimal?>("ConstructionBudget")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+                    b.Property<string>("PhotoContentType")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PhotoOriginalFileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("PhotoSha256")
+                        .IsFixedLength()
+                        .HasMaxLength(64)
+                        .HasColumnType("nchar(64)");
+
+                    b.Property<long?>("PhotoSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PhotoStorageKey")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasPrecision(0)

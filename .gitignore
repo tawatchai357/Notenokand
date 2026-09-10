@@ -13,3 +13,5 @@ appsettings.Local.json
 *.db-wal
 uploads/
 .data-protection/
+
+App_Data/

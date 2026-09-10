@@ -30,6 +30,7 @@ builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, ".data-protection")))
     .SetApplicationName("Notenokand");
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddSingleton<Notenokand.Web.Services.BuildingPhotoStorage>();
 
 var app = builder.Build();
 

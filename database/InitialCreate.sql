@@ -1596,3 +1596,56 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910050000_AddBuildingPhoto'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [PhotoContentType] nvarchar(100) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910050000_AddBuildingPhoto'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [PhotoOriginalFileName] nvarchar(255) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910050000_AddBuildingPhoto'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [PhotoSha256] nchar(64) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910050000_AddBuildingPhoto'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [PhotoSizeBytes] bigint NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910050000_AddBuildingPhoto'
+)
+BEGIN
+    ALTER TABLE [BirdBuildings] ADD [PhotoStorageKey] nvarchar(500) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910050000_AddBuildingPhoto'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260910050000_AddBuildingPhoto', N'10.0.9');
+END;
+
+COMMIT;
+GO
+

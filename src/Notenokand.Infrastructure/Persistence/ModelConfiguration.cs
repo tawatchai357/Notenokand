@@ -20,6 +20,10 @@ public sealed class BirdBuildingConfiguration : IEntityTypeConfiguration<BirdBui
         b.Property(x => x.ConstructionBudget).HasPrecision(18, 2);
         b.Property(x => x.BuiltOrPurchasedYear).HasColumnType("smallint");
         b.Property(x => x.PostalCode).HasColumnType("char(5)");
+        b.Property(x => x.PhotoStorageKey).HasMaxLength(500);
+        b.Property(x => x.PhotoOriginalFileName).HasMaxLength(255);
+        b.Property(x => x.PhotoContentType).HasMaxLength(100);
+        b.Property(x => x.PhotoSha256).HasMaxLength(64).IsFixedLength();
         b.HasOne<ThaiProvince>().WithMany().HasForeignKey(x => x.ProvinceCode).OnDelete(DeleteBehavior.Restrict);
         b.HasOne<ThaiDistrict>().WithMany().HasForeignKey(x => x.DistrictCode).OnDelete(DeleteBehavior.Restrict);
         b.HasOne<ThaiSubdistrict>().WithMany().HasForeignKey(x => x.SubdistrictCode).OnDelete(DeleteBehavior.Restrict);

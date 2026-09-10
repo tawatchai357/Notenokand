@@ -84,6 +84,10 @@ public sealed class BuildingEditViewModel
     [Display(Name = "สถานะ")]
     public BuildingStatus Status { get; set; } = BuildingStatus.Active;
 
+    [Display(Name = "รูปตึกนก")]
+    public IFormFile? Photo { get; set; }
+    public bool HasPhoto { get; set; }
+
     public IReadOnlyList<SelectListItem> Provinces { get; set; } = [];
     public bool IsEdit => Id.HasValue;
 }
@@ -103,4 +107,5 @@ public sealed class BuildingCardViewModel
     public decimal? DepthMeters { get; init; }
     public decimal? ConstructionBudget { get; init; }
     public int? BuiltOrPurchasedYearBuddhist { get; init; }
+    public bool HasPhoto { get; init; }
 }
