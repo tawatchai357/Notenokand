@@ -14,7 +14,7 @@ namespace Notenokand.Web.Controllers;
 public sealed class DashboardController(NotenokandDbContext db, UserManager<ApplicationUser> userManager) : Controller
 {
     [HttpGet("")]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int? year)
     {
         var user = await userManager.GetUserAsync(User);
         if (user is null) return Challenge();
@@ -54,6 +54,21 @@ public sealed class DashboardController(NotenokandDbContext db, UserManager<Appl
         }
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(7));
+        var selectedYear = year is >= 2000 and <= 2200 ? year.Value : today.Year;
+        var yearStart = new DateOnly(selectedYear, 1, 1);
+        var yearEnd = yearStart.AddYears(1);
+        var annualTotals = await db.FinancialTransactions.AsNoTracking()
+            .Where(x => x.AccountId == membership.AccountId && !x.IsDeleted && x.TransactionDate >= yearStart && x.TransactionDate < yearEnd)
+            .GroupBy(x => new { x.TransactionDate.Month, x.Type })
+            .Select(group => new { group.Key.Month, group.Key.Type, Total = group.Sum(x => x.Amount) })
+            .ToListAsync();
+        var monthlyIncome = new decimal[12];
+        var monthlyExpense = new decimal[12];
+        foreach (var total in annualTotals)
+        {
+            if (total.Type == Notenokand.Domain.Enums.TransactionType.Income) monthlyIncome[total.Month - 1] = total.Total;
+            else if (total.Type == Notenokand.Domain.Enums.TransactionType.Expense) monthlyExpense[total.Month - 1] = total.Total;
+        }
         var monthStart = new DateOnly(today.Year, today.Month, 1);
         var monthEnd = monthStart.AddMonths(1);
         var monthTransactions = db.FinancialTransactions.AsNoTracking().Where(x => x.AccountId == membership.AccountId && !x.IsDeleted && x.TransactionDate >= monthStart && x.TransactionDate < monthEnd);
@@ -67,6 +82,9 @@ public sealed class DashboardController(NotenokandDbContext db, UserManager<Appl
             BuildingCount = buildings.Count,
             TotalIncomeThisMonth = totalIncome,
             TotalExpenseThisMonth = totalExpense,
+            FinanceYear = selectedYear,
+            MonthlyIncome = monthlyIncome,
+            MonthlyExpense = monthlyExpense,
             Buildings = buildings
         });
     }

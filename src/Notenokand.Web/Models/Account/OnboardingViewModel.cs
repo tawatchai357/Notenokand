@@ -56,6 +56,12 @@ public sealed class DashboardViewModel
     public decimal TotalIncomeThisMonth { get; init; }
     public decimal TotalExpenseThisMonth { get; init; }
     public decimal NetThisMonth => TotalIncomeThisMonth - TotalExpenseThisMonth;
+    public int FinanceYear { get; init; }
+    public IReadOnlyList<decimal> MonthlyIncome { get; init; } = new decimal[12];
+    public IReadOnlyList<decimal> MonthlyExpense { get; init; } = new decimal[12];
+    public decimal TotalIncomeThisYear => MonthlyIncome.Sum();
+    public decimal TotalExpenseThisYear => MonthlyExpense.Sum();
+    public decimal NetThisYear => TotalIncomeThisYear - TotalExpenseThisYear;
     public string DisplayName { get; init; } = string.Empty;
     public IReadOnlyList<Notenokand.Web.Models.Buildings.BuildingCardViewModel> Buildings { get; init; } = [];
 }
