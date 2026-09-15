@@ -108,4 +108,6 @@ public sealed class BuildingCardViewModel
     public decimal? ConstructionBudget { get; init; }
     public int? BuiltOrPurchasedYearBuddhist { get; init; }
     public bool HasPhoto { get; init; }
+    public decimal TotalIncome { get; set; }
+    public decimal TotalExpense { get; set; }
 }

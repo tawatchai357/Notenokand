@@ -26,6 +26,16 @@ public sealed class DashboardController(NotenokandDbContext db, UserManager<Appl
         var subdistrictCodes = entities.Where(x => x.SubdistrictCode.HasValue).Select(x => x.SubdistrictCode!.Value).Distinct().ToArray();
         var districts = await db.ThaiDistricts.AsNoTracking().Where(x => districtCodes.Contains(x.Code)).ToDictionaryAsync(x => x.Code, x => x.NameTh);
         var subdistricts = await db.ThaiSubdistricts.AsNoTracking().Where(x => subdistrictCodes.Contains(x.Code)).ToDictionaryAsync(x => x.Code, x => x.NameTh);
+        var financialTotalsByBuilding = await db.FinancialTransactions.AsNoTracking()
+            .Where(x => x.AccountId == membership.AccountId && !x.IsDeleted && x.BuildingId.HasValue)
+            .GroupBy(x => x.BuildingId!.Value)
+            .Select(group => new
+            {
+                BuildingId = group.Key,
+                TotalIncome = group.Sum(x => x.Type == Notenokand.Domain.Enums.TransactionType.Income ? x.Amount : 0m),
+                TotalExpense = group.Sum(x => x.Type == Notenokand.Domain.Enums.TransactionType.Expense ? x.Amount : 0m)
+            })
+            .ToDictionaryAsync(x => x.BuildingId);
         var buildings = entities.Select(x => new BuildingCardViewModel
         {
             Id = x.Id, Code = x.Code, Name = x.Name, Latitude = x.Latitude, Longitude = x.Longitude,
@@ -35,6 +45,13 @@ public sealed class DashboardController(NotenokandDbContext db, UserManager<Appl
             HasPhoto = !string.IsNullOrWhiteSpace(x.PhotoStorageKey),
             Location = BuildLocation(x.SubdistrictCode, x.DistrictCode, x.Province, x.PostalCode, subdistricts, districts)
         }).ToList();
+
+        foreach (var building in buildings)
+        {
+            if (!financialTotalsByBuilding.TryGetValue(building.Id, out var totals)) continue;
+            building.TotalIncome = totals.TotalIncome;
+            building.TotalExpense = totals.TotalExpense;
+        }
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(7));
         var monthStart = new DateOnly(today.Year, today.Month, 1);
