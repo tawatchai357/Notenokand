@@ -169,7 +169,7 @@ public sealed class FinanceController(NotenokandDbContext db, UserManager<Applic
         var receipt = await db.TransactionReceipts.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id && x.AccountId == context.Value.AccountId && !x.IsDeleted);
         if (receipt is null) return NotFound();
         var path = ResolveReceiptPath(receipt.StorageKey); if (!System.IO.File.Exists(path)) return NotFound();
-        return PhysicalFile(path, receipt.ContentType, receipt.OriginalFileName, enableRangeProcessing: true);
+        return PhysicalFile(path, receipt.ContentType, enableRangeProcessing: true);
     }
 
     [HttpPost("receipts/{id:guid}/delete")]
