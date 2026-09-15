@@ -24,6 +24,7 @@ public sealed class NotenokandDbContext(DbContextOptions<NotenokandDbContext> op
     public DbSet<ExpenseCategory> ExpenseCategories => Set<ExpenseCategory>();
     public DbSet<FinancialTransaction> FinancialTransactions => Set<FinancialTransaction>();
     public DbSet<TransactionReceipt> TransactionReceipts => Set<TransactionReceipt>();
+    public DbSet<CalendarAppointment> CalendarAppointments => Set<CalendarAppointment>();
     public DbSet<Asset> Assets => Set<Asset>();
     public DbSet<MaintenanceJob> MaintenanceJobs => Set<MaintenanceJob>();
     public DbSet<QualityStandard> QualityStandards => Set<QualityStandard>();

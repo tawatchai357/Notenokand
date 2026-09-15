@@ -1,0 +1,34 @@
+@model Notenokand.Web.Models.Calendar.AppointmentEditViewModel
+@using Notenokand.Domain.Enums
+@{ ViewData["Title"] = Model.IsEdit ? "แก้ไขนัดหมาย" : "เพิ่มนัดหมาย"; }
+<section class="calendar-page appointment-editor-page">
+    <div class="page-breadcrumb"><a asp-action="Index">ปฏิทินนัดหมาย</a><span>/</span><span>@ViewData["Title"]</span></div>
+    <div class="editor-heading"><div><span class="eyebrow">วางแผนล่วงหน้า</span><h1>@ViewData["Title"]</h1><p>กำหนดวัน เวลา และตึกเพื่อให้ติดตามงานได้ง่าย</p></div><a class="btn btn-soft" asp-action="Index">ยกเลิก</a></div>
+    <form method="post" asp-action="@(Model.IsEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" data-appointment-editor>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <section class="form-card appointment-form-card">
+            <div class="section-heading"><span>1</span><div><h2>ข้อมูลนัดหมาย</h2><p>เลือกประเภทนัดหมายก่อนกรอกรายละเอียด</p></div></div>
+            <div class="appointment-type-switch">
+                @foreach (var type in new[] { AppointmentType.Maintenance, AppointmentType.Harvest, AppointmentType.BirdNestSale })
+                {
+                    <label class="@(type == AppointmentType.Maintenance ? "maintenance" : type == AppointmentType.Harvest ? "harvest" : "sale")"><input asp-for="Type" type="radio" value="@type" data-appointment-type /><span>@(type == AppointmentType.Maintenance ? "🔧 ซ่อมบำรุง" : type == AppointmentType.Harvest ? "◈ เก็บรังนก" : "฿ ขายรังนก")</span></label>
+                }
+            </div>
+            <span asp-validation-for="Type"></span>
+            <div class="row g-3 mt-1">
+                <div class="col-12 form-field"><label asp-for="Title"></label><input asp-for="Title" class="form-control" data-appointment-title placeholder="เช่น ตรวจเช็กเครื่องเสียง" /><span asp-validation-for="Title"></span></div>
+                <div class="col-md-6 form-field thai-date-field"><label asp-for="ScheduledDate"></label><input asp-for="ScheduledDate" type="hidden" data-thai-date-value /><div class="thai-date-control"><input type="text" class="form-control" data-thai-datepicker data-target="ScheduledDate" placeholder="เลือกวันที่" autocomplete="off" readonly /><button type="button" class="thai-date-trigger" data-thai-date-trigger aria-label="เปิดปฏิทิน">▦</button></div><span asp-validation-for="ScheduledDate"></span></div>
+                <div class="col-md-6 form-field"><label asp-for="ScheduledTime"></label><input asp-for="ScheduledTime" class="form-control" type="time" step="300" /><span asp-validation-for="ScheduledTime"></span></div>
+                <div class="col-md-6 form-field"><label asp-for="BuildingId"></label><select asp-for="BuildingId" asp-items="Model.Buildings" class="form-select"><option value="">ทุกตึก/ส่วนกลาง</option></select><span asp-validation-for="BuildingId"></span></div>
+                <div class="col-md-6 form-field"><label asp-for="Location"></label><input asp-for="Location" class="form-control" data-appointment-location placeholder="เช่น ห้องควบคุม หรือลานประมูล" /><span asp-validation-for="Location"></span></div>
+                @if (Model.IsEdit)
+                {
+                    <div class="col-md-6 form-field"><label asp-for="Status"></label><select asp-for="Status" class="form-select"><option value="@AppointmentStatus.Scheduled">นัดหมาย</option><option value="@AppointmentStatus.Completed">เสร็จแล้ว</option><option value="@AppointmentStatus.Cancelled">ยกเลิก</option></select></div>
+                }
+                <div class="col-12 form-field"><label asp-for="Notes"></label><textarea asp-for="Notes" class="form-control" rows="4" placeholder="รายละเอียดเพิ่มเติม ผู้ติดต่อ หรือสิ่งที่ต้องเตรียม"></textarea><span asp-validation-for="Notes"></span></div>
+            </div>
+        </section>
+        <div class="sticky-save"><a class="btn btn-soft" asp-action="Index">ยกเลิก</a><button class="btn btn-primary btn-lg" type="submit">บันทึกนัดหมาย <span>→</span></button></div>
+    </form>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /><script src="~/js/calendar-editor.js" asp-append-version="true"></script> }

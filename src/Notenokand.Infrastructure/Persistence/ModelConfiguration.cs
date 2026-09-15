@@ -144,6 +144,19 @@ public sealed class TransactionReceiptConfiguration : IEntityTypeConfiguration<T
     }
 }
 
+public sealed class CalendarAppointmentConfiguration : IEntityTypeConfiguration<CalendarAppointment>
+{
+    public void Configure(EntityTypeBuilder<CalendarAppointment> b)
+    {
+        b.Property(x => x.Title).HasMaxLength(300);
+        b.Property(x => x.Location).HasMaxLength(300);
+        b.Property(x => x.Notes).HasMaxLength(2000);
+        b.Property(x => x.ScheduledTime).HasColumnType("time(0)");
+        b.HasIndex(x => new { x.AccountId, x.ScheduledDate, x.Status });
+        b.HasOne<Account>().WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Restrict);
+        b.HasOne(x => x.Building).WithMany().HasForeignKey(x => x.BuildingId).OnDelete(DeleteBehavior.Restrict);
+    }
+}
 public sealed class QualityStandardConfiguration : IEntityTypeConfiguration<QualityStandard>
 {
     public void Configure(EntityTypeBuilder<QualityStandard> b) => b.HasIndex(x => new { x.OwnerUserId, x.Name, x.Version }).IsUnique();

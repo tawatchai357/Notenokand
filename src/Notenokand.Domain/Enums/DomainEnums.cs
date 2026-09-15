@@ -12,3 +12,5 @@ public enum MaintenancePriority { Low = 1, Normal = 2, High = 3, Urgent = 4 }
 public enum MaintenanceStatus { Reported = 1, InProgress = 2, AwaitingAcceptance = 3, Completed = 4, Cancelled = 5 }
 public enum ImageKind { General = 0, Before = 1, After = 2, Lot = 3, Sample = 4, Document = 5 }
 public enum QualityTrend { Worse = -1, Stable = 0, Better = 1, InsufficientData = 2 }
+public enum AppointmentType { Maintenance = 1, Harvest = 2, BirdNestSale = 3 }
+public enum AppointmentStatus { Scheduled = 1, Completed = 2, Cancelled = 3 }

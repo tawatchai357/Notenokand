@@ -4,7 +4,7 @@
     var dashboardActive = controller == "Dashboard";
     var financeActive = controller == "Finance" && action != "Categories" && action != "CreateCategory" && action != "ToggleCategory";
     var buildingsActive = controller == "Buildings";
-    var categoriesActive = controller == "Finance" && (action == "Categories" || action == "CreateCategory" || action == "ToggleCategory");
+    var calendarActive = controller == "Calendar";
 }
 <nav class="app-bottom-nav" aria-label="เมนูหลักด้านล่าง">
     <a class="bottom-nav-item @(dashboardActive ? "active" : "")" asp-controller="Dashboard" asp-action="Index" aria-current="@(dashboardActive ? "page" : null)">
@@ -17,11 +17,11 @@
     <a class="bottom-nav-item @(buildingsActive ? "active" : "")" asp-controller="Dashboard" asp-action="Index" asp-fragment="buildings" aria-current="@(buildingsActive ? "page" : null)">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V7l7-4 7 4v14M9 9h2M14 9h2M9 13h2M14 13h2M9 17h2M14 17h2"/></svg><span>ตึกนก</span>
     </a>
-    <a class="bottom-nav-item @(categoriesActive ? "active" : "")" asp-controller="Finance" asp-action="Categories" aria-current="@(categoriesActive ? "page" : null)">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16M7 4v4M12 10v4M17 16v4"/></svg><span>หมวดหมู่</span>
+    <a class="bottom-nav-item @(calendarActive ? "active" : "")" asp-controller="Calendar" asp-action="Index" aria-current="@(calendarActive ? "page" : null)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a1 1 0 0 1 1 1v15H4V5a1 1 0 0 1 1-1ZM8 2v4M16 2v4M4 9h16M8 13h2M14 13h2M8 17h2M14 17h2"/></svg><span>ปฏิทิน</span>
     </a>
 </nav>
 <div class="offcanvas offcanvas-bottom quick-add-sheet" tabindex="-1" id="quickAddSheet" aria-labelledby="quickAddTitle">
     <div class="offcanvas-header"><div><small>คำสั่งด่วน</small><h2 class="offcanvas-title" id="quickAddTitle">ต้องการเพิ่มอะไร?</h2></div><button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="ปิด"></button></div>
-    <div class="offcanvas-body"><div class="quick-add-grid"><a asp-controller="Finance" asp-action="Create" asp-route-type="Expense"><span class="expense">↘</span><div><strong>เพิ่มค่าใช้จ่าย</strong><small>บันทึกค่าไฟ ค่าแรง หรือค่าใช้จ่ายอื่น</small></div></a><a asp-controller="Finance" asp-action="Create" asp-route-type="Income"><span class="income">↗</span><div><strong>เพิ่มรายรับ</strong><small>บันทึกยอดขายและรายได้ของกิจการ</small></div></a><a asp-controller="Buildings" asp-action="Create"><span class="building">⌂</span><div><strong>เพิ่มตึกนก</strong><small>เพิ่มข้อมูล รูปภาพ และตำแหน่งตึก</small></div></a></div><form class="quick-logout" asp-controller="Account" asp-action="Logout" method="post"><button type="submit">ออกจากระบบ</button></form></div>
+    <div class="offcanvas-body"><div class="quick-add-grid"><a asp-controller="Finance" asp-action="Create" asp-route-type="Expense"><span class="expense">↘</span><div><strong>เพิ่มค่าใช้จ่าย</strong><small>บันทึกค่าไฟ ค่าแรง หรือค่าใช้จ่ายอื่น</small></div></a><a asp-controller="Finance" asp-action="Create" asp-route-type="Income"><span class="income">↗</span><div><strong>เพิ่มรายรับ</strong><small>บันทึกยอดขายและรายได้ของกิจการ</small></div></a><a asp-controller="Buildings" asp-action="Create"><span class="building">⌂</span><div><strong>เพิ่มตึกนก</strong><small>เพิ่มข้อมูล รูปภาพ และตำแหน่งตึก</small></div></a><a asp-controller="Calendar" asp-action="Create"><span class="calendar">▦</span><div><strong>เพิ่มนัดหมาย</strong><small>วางแผนซ่อม เก็บรัง หรือขายรังนก</small></div></a></div><form class="quick-logout" asp-controller="Account" asp-action="Logout" method="post"><button type="submit">ออกจากระบบ</button></form></div>
 </div>

@@ -1,0 +1,73 @@
+@model Notenokand.Web.Models.Calendar.CalendarIndexViewModel
+@using Notenokand.Domain.Enums
+@{
+    ViewData["Title"] = "ปฏิทินนัดหมาย";
+    var firstOffset = ((int)Model.MonthStart.DayOfWeek + 6) % 7;
+    var daysInMonth = DateTime.DaysInMonth(Model.MonthStart.Year, Model.MonthStart.Month);
+    var totalCells = (int)Math.Ceiling((firstOffset + daysInMonth) / 7d) * 7;
+    var appointmentsByDate = Model.Appointments.ToLookup(x => x.ScheduledDate);
+    var today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(7));
+    var scheduledCount = Model.Appointments.Count(x => x.Status == AppointmentStatus.Scheduled);
+}
+@functions {
+    private static string TypeName(AppointmentType type) => type switch { AppointmentType.Maintenance => "ซ่อมบำรุง", AppointmentType.Harvest => "เก็บรังนก", AppointmentType.BirdNestSale => "ขายรังนก", _ => "นัดหมาย" };
+    private static string TypeClass(AppointmentType type) => type switch { AppointmentType.Maintenance => "maintenance", AppointmentType.Harvest => "harvest", AppointmentType.BirdNestSale => "sale", _ => "" };
+    private static string StatusName(AppointmentStatus status) => status switch { AppointmentStatus.Completed => "เสร็จแล้ว", AppointmentStatus.Cancelled => "ยกเลิก", _ => "นัดหมาย" };
+}
+<section class="calendar-page">
+    <div class="calendar-heading">
+        <div><span class="eyebrow">แผนงานกิจการ</span><h1>ปฏิทินนัดหมาย</h1><p>วางแผนซ่อมบำรุง เก็บรังนก และขายรังนกในที่เดียว</p></div>
+        <a class="btn btn-primary" asp-action="Create">+ เพิ่มนัดหมาย</a>
+    </div>
+    <div class="calendar-summary">
+        <article><small>นัดหมายเดือนนี้</small><strong>@Model.Appointments.Count</strong></article>
+        <article><small>กำลังรอ</small><strong>@scheduledCount</strong></article>
+        <article><small>เสร็จแล้ว</small><strong>@Model.Appointments.Count(x => x.Status == AppointmentStatus.Completed)</strong></article>
+    </div>
+    <div class="calendar-type-actions" aria-label="เพิ่มนัดหมายด่วน">
+        <a class="maintenance" asp-action="Create" asp-route-type="@AppointmentType.Maintenance">＋ ซ่อมบำรุง</a>
+        <a class="harvest" asp-action="Create" asp-route-type="@AppointmentType.Harvest">＋ เก็บรังนก</a>
+        <a class="sale" asp-action="Create" asp-route-type="@AppointmentType.BirdNestSale">＋ ขายรังนก</a>
+    </div>
+    <section class="month-calendar" aria-label="ปฏิทิน @Model.PeriodDisplay">
+        <div class="month-calendar-header"><a asp-action="Index" asp-route-period="@Model.PreviousPeriod" aria-label="เดือนก่อน">‹</a><h2>@Model.PeriodDisplay</h2><a asp-action="Index" asp-route-period="@Model.NextPeriod" aria-label="เดือนถัดไป">›</a></div>
+        <div class="month-weekdays"><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span><span>อา</span></div>
+        <div class="month-days">
+            @for (var cell = 0; cell < totalCells; cell++)
+            {
+                var day = cell - firstOffset + 1;
+                if (day < 1 || day > daysInMonth) { <span class="month-day blank"></span> }
+                else
+                {
+                    var date = new DateOnly(Model.MonthStart.Year, Model.MonthStart.Month, day);
+                    var events = appointmentsByDate[date].ToList();
+                    <button type="button" class="month-day @(date == today ? "today" : "") @(events.Count > 0 ? "has-events" : "")" data-calendar-day data-date="@date.ToString("yyyy-MM-dd")" aria-label="วันที่ @day มี @events.Count นัดหมาย">
+                        <b>@day</b>
+                        <span class="month-event-dots">@foreach (var item in events.Take(3)) { <i class="@TypeClass(item.Type)"></i> }</span>
+                        @if (events.Count > 0) { <small>@events.Count นัด</small> }
+                    </button>
+                }
+            }
+        </div>
+    </section>
+    <div class="appointment-list-heading"><div><span class="eyebrow">รายการนัดหมาย</span><h2 data-appointment-heading>ทั้งหมดในเดือนนี้</h2></div><button type="button" class="btn btn-soft btn-sm" data-clear-day hidden>แสดงทั้งหมด</button></div>
+    @if (Model.Appointments.Count == 0)
+    {
+        <div class="content-card empty-state"><div class="empty-icon">▦</div><h2>ยังไม่มีนัดหมายในเดือนนี้</h2><p>เพิ่มแผนงานเพื่อไม่พลาดวันสำคัญของกิจการ</p><a class="btn btn-primary" asp-action="Create">+ เพิ่มนัดหมาย</a></div>
+    }
+    else
+    {
+        <div class="appointment-card-list">
+        @foreach (var item in Model.Appointments)
+        {
+            <article class="appointment-card @TypeClass(item.Type) @(item.Status != AppointmentStatus.Scheduled ? "muted" : "")" data-appointment-card data-date="@item.ScheduledDate.ToString("yyyy-MM-dd")">
+                <div class="appointment-date"><strong>@item.ScheduledDate.Day</strong><small>@item.ScheduledDate.ToString("MMM", new System.Globalization.CultureInfo("th-TH"))</small></div>
+                <div class="appointment-main"><div class="appointment-title"><span class="appointment-type @TypeClass(item.Type)">@TypeName(item.Type)</span><span class="appointment-status status-@item.Status.ToString().ToLowerInvariant()">@StatusName(item.Status)</span><h3>@item.Title</h3></div><div class="appointment-meta"><span>เวลา @(item.ScheduledTime.HasValue ? item.ScheduledTime.Value.ToString("HH:mm") + " น." : "ไม่ระบุ")</span><span>@item.BuildingName</span>@if(!string.IsNullOrWhiteSpace(item.Location)){<span>@item.Location</span>}</div>@if(!string.IsNullOrWhiteSpace(item.Notes)){<p>@item.Notes</p>}</div>
+                <div class="appointment-actions"><a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@item.Id">แก้ไข</a>@if(item.Status != AppointmentStatus.Cancelled){<form method="post" asp-action="Complete" asp-route-id="@item.Id"><button class="btn btn-soft btn-sm" type="submit">@(item.Status == AppointmentStatus.Completed ? "เปิดอีกครั้ง" : "ทำเสร็จแล้ว")</button></form>}<form method="post" asp-action="Delete" asp-route-id="@item.Id" data-appointment-delete data-name="@item.Title"><button class="btn btn-link text-danger btn-sm" type="submit">ลบ</button></form></div>
+            </article>
+        }
+        </div>
+        <div class="content-card no-appointment-results" data-no-appointment hidden>ไม่มีนัดหมายในวันที่เลือก <a asp-action="Create" data-create-for-day>เพิ่มนัดหมาย</a></div>
+    }
+</section>
+@section Scripts { <script src="~/js/calendar-index.js" asp-append-version="true"></script> }
