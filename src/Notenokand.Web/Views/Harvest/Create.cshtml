@@ -1,0 +1,27 @@
+@model Notenokand.Web.Models.Harvest.HarvestEditViewModel
+@using Notenokand.Web.Models.Harvest
+@{ ViewData["Title"] = "บันทึกการเก็บรังนก"; }
+<section class="finance-page">
+    <div class="page-breadcrumb"><a asp-action="Index">การเก็บรังนก</a><span>/ บันทึกการเก็บ</span></div>
+    <div class="editor-heading"><div><h1>บันทึกการเก็บรังนก</h1><p>หนึ่งครั้งเพิ่มรังได้หลายประเภท แยกน้ำหนักแต่ละรายการ</p></div></div>
+    <form asp-action="Create" method="post" data-harvest-form>
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        <section class="form-card mb-3"><div class="row g-3">
+            <div class="col-md-6"><label asp-for="BuildingId">ตึกนก</label><select asp-for="BuildingId" asp-items="Model.Buildings" class="form-select" required><option value="">เลือกตึกนก</option></select><span asp-validation-for="BuildingId"></span></div>
+            <div class="col-md-6 form-field thai-date-field"><label asp-for="HarvestedOn">วันที่เก็บรังนก</label><input asp-for="HarvestedOn" type="hidden" data-thai-date-value /><div class="thai-date-control"><input class="form-control" data-thai-datepicker data-target="HarvestedOn" readonly placeholder="เลือกวันที่" /><button type="button" class="thai-date-trigger" data-thai-date-trigger aria-label="เปิดปฏิทิน">▦</button></div><span asp-validation-for="HarvestedOn"></span></div>
+        </div></section>
+        <div data-harvest-lines>
+        @for (var i = 0; i < Model.Items.Count; i++)
+        {
+            <partial name="_Line" model="Model" view-data='new ViewDataDictionary(ViewData) { ["LineIndex"] = i }' />
+        }
+        </div>
+        <button class="btn btn-soft w-100 my-3" type="button" data-add-line>+ เพิ่มประเภทรังอีกหนึ่งรายการ</button>
+        <div class="form-card"><label asp-for="Notes">หมายเหตุ</label><textarea asp-for="Notes" class="form-control" rows="3"></textarea><span asp-validation-for="Notes"></span></div>
+        <div class="sticky-save harvest-save"><div aria-live="polite">น้ำหนักรวม <strong data-harvest-total>@Model.TotalWeightKg.ToString("N3")</strong> กก.</div><a class="btn btn-soft" asp-action="Index">ยกเลิก</a><button type="submit" class="btn btn-primary">บันทึกการเก็บ</button></div>
+    </form>
+    <template data-harvest-template>
+        <partial name="_Line" model="@(new HarvestEditViewModel { NestTypes = Model.NestTypes, Colors = Model.Colors, Conditions = Model.Conditions })" view-data='new ViewDataDictionary(ViewData) { ["LineIndex"] = 0 }' />
+    </template>
+</section>
+@section Scripts { <script src="~/js/harvest-editor.js" asp-append-version="true"></script> }

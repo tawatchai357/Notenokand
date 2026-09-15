@@ -1,0 +1,11 @@
+@model Notenokand.Web.Models.Harvest.HarvestEditViewModel
+@{ var i = (int)(ViewData["LineIndex"] ?? 0); }
+<article class="form-card harvest-line">
+    <div class="section-toolbar"><h3>รายการที่ <span data-line-number>@(i + 1)</span></h3><button type="button" class="btn btn-link text-danger" data-remove-line>ลบรายการ</button></div>
+    <div class="row g-3">
+        <div class="col-md-6"><label asp-for="Items[i].NestTypeId">ลักษณะรัง</label><select asp-for="Items[i].NestTypeId" asp-items="Model.NestTypes" class="form-select" required><option value="">เลือกลักษณะรัง</option></select><span asp-validation-for="Items[i].NestTypeId"></span></div>
+        <div class="col-md-6"><label asp-for="Items[i].ColorId">สีรัง</label><select asp-for="Items[i].ColorId" asp-items="Model.Colors" class="form-select" required><option value="">เลือกสีรัง</option></select><span asp-validation-for="Items[i].ColorId"></span></div>
+        <div class="col-md-6"><label asp-for="Items[i].ConditionId">สภาพรัง</label><select asp-for="Items[i].ConditionId" asp-items="Model.Conditions" class="form-select" required><option value="">เลือกสภาพรัง</option></select><span asp-validation-for="Items[i].ConditionId"></span></div>
+        <div class="col-md-6"><label asp-for="Items[i].WeightKg">น้ำหนัก (กก.)</label><input asp-for="Items[i].WeightKg" type="number" class="form-control" step="0.001" min="0.001" max="999999999" inputmode="decimal" placeholder="0.000" data-weight required /><span asp-validation-for="Items[i].WeightKg"></span></div>
+    </div>
+</article>

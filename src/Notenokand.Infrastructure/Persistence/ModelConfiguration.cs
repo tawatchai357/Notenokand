@@ -63,6 +63,7 @@ public sealed class HarvestItemConfiguration : IEntityTypeConfiguration<HarvestI
     {
         b.Property(x => x.WeightKg).HasPrecision(14, 3);
         b.Property(x => x.RemainingWeightKg).HasPrecision(14, 3);
+        b.HasOne<MasterOption>().WithMany().HasForeignKey(x => x.ConditionId).OnDelete(DeleteBehavior.Restrict);
         b.ToTable(t => t.HasCheckConstraint("CK_HarvestItems_Weight", "[WeightKg] >= 0 AND [RemainingWeightKg] >= 0 AND [RemainingWeightKg] <= [WeightKg]"));
     }
 }

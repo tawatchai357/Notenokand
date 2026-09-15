@@ -1,0 +1,21 @@
+@model Notenokand.Web.Models.Harvest.HarvestIndexViewModel
+@{ ViewData["Title"] = "การเก็บรังนก"; string Name(Guid? id) => id.HasValue && Model.OptionNames.TryGetValue(id.Value, out var name) ? name : "ไม่ระบุ"; }
+<section class="finance-page">
+    <div class="editor-heading"><div><h1>การเก็บรังนก</h1><p>ประวัติวันที่เก็บ ตึก และน้ำหนักแยกตามประเภทรัง</p></div><a asp-action="Create" class="btn btn-primary">+ บันทึกการเก็บ</a></div>
+    @if(Model.Rounds.Count == 0) {
+        <div class="content-card empty-state"><h2>ยังไม่มีบันทึกการเก็บรังนก</h2><p>เลือกตึกและวันที่ แล้วเพิ่มรายการรังที่เก็บได้</p><a asp-action="Create" class="btn btn-soft">เริ่มบันทึก</a></div>
+    }
+    <div class="harvest-history">
+    @foreach(var round in Model.Rounds) {
+        <article class="content-card">
+            <div class="section-toolbar"><div><span class="eyebrow">@round.Building.Name</span><h2>@round.HarvestedOn.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("th-TH"))</h2></div><strong>รวม @round.TotalWeightKg.ToString("N3") กก.</strong></div>
+            <details><summary>ดูรายละเอียด @round.Items.Count รายการ</summary><div class="harvest-details">
+            @foreach(var item in round.Items) {
+                <div><strong>@Name(item.NestTypeId)</strong><span>@Name(item.ColorId) · @Name(item.ConditionId)</span><b>@item.WeightKg.ToString("N3") กก.</b></div>
+            }
+            </div></details>
+            @if(!string.IsNullOrWhiteSpace(round.EnvironmentNotes)){<p class="mt-3">@round.EnvironmentNotes</p>}
+        </article>
+    }
+    </div>
+</section>

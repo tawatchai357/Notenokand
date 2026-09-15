@@ -78,6 +78,7 @@ public sealed class HarvestRound : Entity
 
 public sealed class HarvestItem : Entity
 {
+    public Guid? ConditionId { get; set; }
     public Guid HarvestRoundId { get; set; }
     public Guid NestTypeId { get; set; }
     public Guid? GradeId { get; set; }
