@@ -72,6 +72,8 @@ public sealed class FinancialTransaction : Entity
     public string? ReferenceNumber { get; set; }
     public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.BankTransfer;
     public string? Counterparty { get; set; }
+    public string? SaleLocation { get; set; }
+    public decimal? AveragePricePerKg { get; set; }
     public string? Notes { get; set; }
     public ICollection<TransactionReceipt> Receipts { get; set; } = [];
 }

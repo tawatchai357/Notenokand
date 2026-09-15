@@ -52,7 +52,7 @@ public sealed class FinanceController(NotenokandDbContext db, UserManager<Applic
             Id = x.Id, Type = x.Type, TransactionDate = x.TransactionDate, Description = x.Description, Amount = x.Amount,
             CategoryName = x.ExpenseCategoryId.HasValue && categories.TryGetValue(x.ExpenseCategoryId.Value, out var category) ? category : "ไม่ระบุหมวดหมู่",
             BuildingName = x.BuildingId.HasValue && buildings.TryGetValue(x.BuildingId.Value, out var building) ? building : "ส่วนกลาง",
-            PaymentMethodName = PaymentMethodName(x.PaymentMethod), Counterparty = x.Counterparty, ReferenceNumber = x.ReferenceNumber,
+            PaymentMethodName = PaymentMethodName(x.PaymentMethod), Counterparty = x.Counterparty, SaleLocation = x.SaleLocation, AveragePricePerKg = x.AveragePricePerKg, ReferenceNumber = x.ReferenceNumber,
             ReceiptCount = receipts.TryGetValue(x.Id, out var receipt) ? receipt.Count : 0,
             FirstReceiptId = receipts.TryGetValue(x.Id, out receipt) ? receipt.FirstId : null
         }).ToList();
@@ -83,14 +83,15 @@ public sealed class FinanceController(NotenokandDbContext db, UserManager<Applic
     {
         var context = await GetAccountContextAsync();
         if (context is null) return Forbid();
-        await ValidateEditorAsync(model, context.Value.AccountId);
+        var isBirdNestSale = await ValidateEditorAsync(model, context.Value.AccountId);
         if (!ModelState.IsValid) { await LoadEditorOptionsAsync(model, context.Value.AccountId); return View("Edit", model); }
         var transaction = new FinancialTransaction
         {
             AccountId = context.Value.AccountId, OwnerUserId = context.Value.UserId, BuildingId = model.BuildingId,
             ExpenseCategoryId = model.CategoryId, Type = model.Type, TransactionDate = model.TransactionDate, PaidOn = model.TransactionDate,
             Description = model.Description.Trim(), Amount = model.Amount, PaymentMethod = model.PaymentMethod,
-            Counterparty = Clean(model.Counterparty), ReferenceNumber = Clean(model.ReferenceNumber), Notes = Clean(model.Notes), CreatedByUserId = context.Value.UserId
+            Counterparty = Clean(model.Counterparty), SaleLocation = isBirdNestSale ? Clean(model.SaleLocation) : null,
+            AveragePricePerKg = isBirdNestSale ? model.AveragePricePerKg : null, ReferenceNumber = Clean(model.ReferenceNumber), Notes = Clean(model.Notes), CreatedByUserId = context.Value.UserId
         };
         string? writtenPath = null;
         try
@@ -118,7 +119,7 @@ public sealed class FinanceController(NotenokandDbContext db, UserManager<Applic
         {
             Id = entity.Id, Type = entity.Type, TransactionDate = entity.TransactionDate, Description = entity.Description,
             Amount = entity.Amount, BuildingId = entity.BuildingId, CategoryId = entity.ExpenseCategoryId,
-            PaymentMethod = entity.PaymentMethod, Counterparty = entity.Counterparty, ReferenceNumber = entity.ReferenceNumber, Notes = entity.Notes,
+            PaymentMethod = entity.PaymentMethod, Counterparty = entity.Counterparty, SaleLocation = entity.SaleLocation, AveragePricePerKg = entity.AveragePricePerKg, ReferenceNumber = entity.ReferenceNumber, Notes = entity.Notes,
             ExistingReceipts = await db.TransactionReceipts.AsNoTracking().Where(x => x.AccountId == context.Value.AccountId && x.FinancialTransactionId == id && !x.IsDeleted).Select(x => new ReceiptViewModel { Id = x.Id, FileName = x.OriginalFileName, SizeBytes = x.SizeBytes }).ToListAsync()
         };
         await LoadEditorOptionsAsync(model, context.Value.AccountId, includeBuildingId: entity.BuildingId);
@@ -133,12 +134,13 @@ public sealed class FinanceController(NotenokandDbContext db, UserManager<Applic
         var context = await GetAccountContextAsync(); if (context is null) return Forbid();
         var entity = await db.FinancialTransactions.SingleOrDefaultAsync(x => x.Id == id && x.AccountId == context.Value.AccountId && !x.IsDeleted);
         if (entity is null) return NotFound();
-        model.Id = id; await ValidateEditorAsync(model, context.Value.AccountId, entity.BuildingId);
+        model.Id = id; var isBirdNestSale = await ValidateEditorAsync(model, context.Value.AccountId, entity.BuildingId);
         if (!ModelState.IsValid) { await LoadEditorOptionsAsync(model, context.Value.AccountId, entity.BuildingId); model.ExistingReceipts = await LoadReceiptsAsync(context.Value.AccountId, id); return View(model); }
         entity.Type = model.Type; entity.TransactionDate = model.TransactionDate; entity.PaidOn = model.TransactionDate;
         entity.Description = model.Description.Trim(); entity.Amount = model.Amount; entity.BuildingId = model.BuildingId;
         entity.ExpenseCategoryId = model.CategoryId; entity.PaymentMethod = model.PaymentMethod;
-        entity.Counterparty = Clean(model.Counterparty); entity.ReferenceNumber = Clean(model.ReferenceNumber); entity.Notes = Clean(model.Notes);
+        entity.Counterparty = Clean(model.Counterparty); entity.SaleLocation = isBirdNestSale ? Clean(model.SaleLocation) : null;
+        entity.AveragePricePerKg = isBirdNestSale ? model.AveragePricePerKg : null; entity.ReferenceNumber = Clean(model.ReferenceNumber); entity.Notes = Clean(model.Notes);
         entity.UpdatedAt = DateTimeOffset.UtcNow; entity.UpdatedByUserId = context.Value.UserId;
         string? writtenPath = null;
         try
@@ -219,17 +221,37 @@ public sealed class FinanceController(NotenokandDbContext db, UserManager<Applic
         await db.SaveChangesAsync(); TempData["SuccessMessage"] = category.IsActive ? "เปิดใช้หมวดหมู่แล้ว" : "ปิดใช้หมวดหมู่แล้ว"; return RedirectToAction(nameof(Categories));
     }
 
-    private async Task ValidateEditorAsync(FinanceEditViewModel model, Guid accountId, Guid? existingBuildingId = null)
+    private async Task<bool> ValidateEditorAsync(FinanceEditViewModel model, Guid accountId, Guid? existingBuildingId = null)
     {
-        if (model.BuildingId.HasValue && !await db.BirdBuildings.AnyAsync(x => x.Id == model.BuildingId && x.AccountId == accountId && !x.IsDeleted && (x.Status == BuildingStatus.Active || x.Id == existingBuildingId))) ModelState.AddModelError(nameof(model.BuildingId), "ตึกที่เลือกไม่พร้อมใช้งาน");
-        if (!model.CategoryId.HasValue || !await db.ExpenseCategories.AnyAsync(x => x.Id == model.CategoryId && x.AccountId == accountId && x.Type == model.Type && x.IsActive && !x.IsDeleted)) ModelState.AddModelError(nameof(model.CategoryId), "หมวดหมู่ไม่ตรงกับประเภทรายการหรือถูกปิดใช้งาน");
+        if (model.BuildingId.HasValue && !await db.BirdBuildings.AnyAsync(x => x.Id == model.BuildingId && x.AccountId == accountId && !x.IsDeleted && (x.Status == BuildingStatus.Active || x.Id == existingBuildingId)))
+            ModelState.AddModelError(nameof(model.BuildingId), "ตึกที่เลือกไม่พร้อมใช้งาน");
+
+        var category = model.CategoryId.HasValue
+            ? await db.ExpenseCategories.AsNoTracking().SingleOrDefaultAsync(x => x.Id == model.CategoryId && x.AccountId == accountId && x.Type == model.Type && x.IsActive && !x.IsDeleted)
+            : null;
+        if (category is null)
+            ModelState.AddModelError(nameof(model.CategoryId), "หมวดหมู่ไม่ตรงกับประเภทรายการหรือถูกปิดใช้งาน");
+
+        var isBirdNestSale = category is { Type: TransactionType.Income, Name: "ขายรังนก" };
+        if (isBirdNestSale)
+        {
+            if (string.IsNullOrWhiteSpace(model.SaleLocation)) ModelState.AddModelError(nameof(model.SaleLocation), "กรุณากรอกสถานที่ขาย");
+            if (string.IsNullOrWhiteSpace(model.Counterparty)) ModelState.AddModelError(nameof(model.Counterparty), "กรุณากรอกชื่อผู้ซื้อ");
+            if (!model.AveragePricePerKg.HasValue || model.AveragePricePerKg <= 0) ModelState.AddModelError(nameof(model.AveragePricePerKg), "กรุณากรอกราคาเฉลี่ยต่อกิโลกรัม");
+        }
+        else
+        {
+            model.SaleLocation = null;
+            model.AveragePricePerKg = null;
+        }
+
         if (model.Receipt is not null)
         {
             if (model.Receipt.Length <= 0 || model.Receipt.Length > MaxReceiptBytes) ModelState.AddModelError(nameof(model.Receipt), "ไฟล์ต้องมีขนาดไม่เกิน 10 MB");
             if (DetectReceipt(model.Receipt) is null) ModelState.AddModelError(nameof(model.Receipt), "รองรับเฉพาะ JPG, PNG, WebP หรือ PDF");
         }
+        return isBirdNestSale;
     }
-
     private async Task LoadEditorOptionsAsync(FinanceEditViewModel model, Guid accountId, Guid? includeBuildingId = null)
     {
         model.Buildings = await db.BirdBuildings.AsNoTracking().Where(x => x.AccountId == accountId && !x.IsDeleted && (x.Status == BuildingStatus.Active || x.Id == includeBuildingId)).OrderBy(x => x.Name).Select(x => new SelectListItem(x.Name + (x.Status == BuildingStatus.Inactive ? " (ไม่ใช้งาน)" : ""), x.Id.ToString())).ToListAsync();

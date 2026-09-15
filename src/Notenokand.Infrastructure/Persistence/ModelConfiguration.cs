@@ -119,6 +119,8 @@ public sealed class FinancialTransactionConfiguration : IEntityTypeConfiguration
         b.Property(x => x.Description).HasMaxLength(500);
         b.Property(x => x.ReferenceNumber).HasMaxLength(100);
         b.Property(x => x.Counterparty).HasMaxLength(200);
+        b.Property(x => x.SaleLocation).HasMaxLength(300);
+        b.Property(x => x.AveragePricePerKg).HasPrecision(18, 2);
         b.Property(x => x.Notes).HasMaxLength(2000);
         b.HasIndex(x => new { x.AccountId, x.TransactionDate, x.Type });
         b.HasOne<Account>().WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Restrict);

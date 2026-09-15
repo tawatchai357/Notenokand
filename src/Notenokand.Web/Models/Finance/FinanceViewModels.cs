@@ -31,6 +31,8 @@ public sealed class FinanceCardViewModel
     public string BuildingName { get; init; } = "ส่วนกลาง";
     public string PaymentMethodName { get; init; } = string.Empty;
     public string? Counterparty { get; init; }
+    public string? SaleLocation { get; init; }
+    public decimal? AveragePricePerKg { get; init; }
     public string? ReferenceNumber { get; init; }
     public int ReceiptCount { get; init; }
     public Guid? FirstReceiptId { get; init; }
@@ -72,6 +74,13 @@ public sealed class FinanceEditViewModel
     [Display(Name = "ผู้รับเงิน/ผู้จ่ายเงิน")]
     public string? Counterparty { get; set; }
 
+    [StringLength(300)]
+    [Display(Name = "สถานที่ขาย")]
+    public string? SaleLocation { get; set; }
+
+    [Range(typeof(decimal), "0.01", "9999999999999999", ErrorMessage = "ราคาเฉลี่ยต่อกิโลกรัมต้องมากกว่า 0")]
+    [Display(Name = "ราคาเฉลี่ยต่อ กก. (บาท)")]
+    public decimal? AveragePricePerKg { get; set; }
     [StringLength(100)]
     [Display(Name = "เลขที่เอกสาร/เลขอ้างอิง")]
     public string? ReferenceNumber { get; set; }
