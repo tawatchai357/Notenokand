@@ -5,6 +5,8 @@
   const types = [...form.querySelectorAll('[data-transaction-type]')];
   const category = form.querySelector('[data-category-select]');
   const description = form.querySelector('[data-description-input]');
+  const transactionDateLabel = form.querySelector('[data-transaction-date-label]');
+  const totalAmountLabel = form.querySelector('[data-total-amount-label]');
   const counterpartyLabel = form.querySelector('[data-counterparty-label]');
   const counterpartyInput = form.querySelector('[data-counterparty-input]');
   const saleFields = [...form.querySelectorAll('[data-bird-nest-sale-field]')];
@@ -19,6 +21,8 @@
 
     const selectedCategory = category?.selectedOptions[0];
     const birdNestSale = income && selectedCategory?.dataset.categoryName === 'ขายรังนก';
+    if (transactionDateLabel) transactionDateLabel.textContent = birdNestSale ? 'วันที่ขาย' : (income ? 'วันที่รับเงิน' : 'วันที่จ่าย');
+    if (totalAmountLabel) totalAmountLabel.textContent = birdNestSale ? 'ราคารวม (บาท)' : 'จำนวนเงิน (บาท)';
     saleFields.forEach((field) => { field.hidden = !birdNestSale; });
     saleRequiredInputs.forEach((input) => { input.required = birdNestSale; });
     if (counterpartyInput) counterpartyInput.required = birdNestSale;
