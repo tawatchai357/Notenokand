@@ -1,0 +1,39 @@
+@model Notenokand.Web.Models.Finance.FinanceIndexViewModel
+@using Notenokand.Domain.Enums
+@using System.Globalization
+@{
+    ViewData["Title"] = "รายรับ–ค่าใช้จ่าย";
+    var month = DateOnly.ParseExact(Model.Period + "-01", "yyyy-MM-dd", CultureInfo.InvariantCulture);
+    var previous = month.AddMonths(-1).ToString("yyyy-MM", CultureInfo.InvariantCulture);
+    var next = month.AddMonths(1).ToString("yyyy-MM", CultureInfo.InvariantCulture);
+    string[] thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+}
+<section class="finance-page">
+    <div class="finance-heading">
+        <div><span class="eyebrow">บัญชีของกิจการ</span><h1>รายรับ–ค่าใช้จ่าย</h1><p>สรุปกระแสเงินสดและรายการของทุกตึกในที่เดียว</p></div>
+        <div class="finance-heading-actions"><a class="btn btn-soft" asp-action="Categories">จัดการหมวดหมู่</a><a class="btn btn-income" asp-action="Create" asp-route-type="@TransactionType.Income">+ รายรับ</a><a class="btn btn-primary" asp-action="Create" asp-route-type="@TransactionType.Expense">+ ค่าใช้จ่าย</a></div>
+    </div>
+    <div class="finance-period"><a asp-action="Index" asp-route-period="@previous" aria-label="เดือนก่อน">‹</a><strong>@Model.PeriodDisplay</strong><a asp-action="Index" asp-route-period="@next" aria-label="เดือนถัดไป">›</a></div>
+    <section class="finance-summary" aria-label="สรุปการเงิน"><article class="income"><small>รายรับเดือนนี้</small><strong>฿@Model.TotalIncome.ToString("N2")</strong></article><article class="expense"><small>ค่าใช้จ่ายเดือนนี้</small><strong>฿@Model.TotalExpense.ToString("N2")</strong></article><article class="@(Model.NetAmount >= 0 ? "positive" : "negative")"><small>คงเหลือสุทธิ</small><strong>฿@Model.NetAmount.ToString("N2")</strong></article></section>
+    <form method="get" class="finance-filters"><input type="hidden" name="period" value="@Model.Period" /><div><label asp-for="Type">ประเภท</label><select asp-for="Type" class="form-select"><option value="">ทั้งหมด</option><option value="@TransactionType.Income">รายรับ</option><option value="@TransactionType.Expense">ค่าใช้จ่าย</option></select></div><div><label asp-for="BuildingId">ตึกนก</label><select asp-for="BuildingId" asp-items="Model.Buildings" class="form-select"><option value="">ทุกตึก</option></select></div><div><label asp-for="CategoryId">หมวดหมู่</label><select asp-for="CategoryId" asp-items="Model.Categories" class="form-select"><option value="">ทุกหมวดหมู่</option></select></div><button class="btn btn-soft" type="submit">แสดงผล</button></form>
+    <div class="section-toolbar"><div><span class="eyebrow">รายการประจำเดือน</span><h2>@Model.Transactions.Count รายการ</h2></div></div>
+    @if (Model.Transactions.Count == 0)
+    {
+        <div class="content-card empty-state"><div class="empty-icon">฿</div><h2>ยังไม่มีรายการในเดือนนี้</h2><p>เริ่มบันทึกรายรับหรือค่าใช้จ่ายเพื่อดูสรุปของกิจการ</p><div class="action-grid"><a asp-action="Create" asp-route-type="@TransactionType.Expense">+ ค่าใช้จ่าย</a><a asp-action="Create" asp-route-type="@TransactionType.Income">+ รายรับ</a></div></div>
+    }
+    else
+    {
+        <div class="finance-card-list">
+        @foreach (var item in Model.Transactions)
+        {
+            var income = item.Type == TransactionType.Income;
+            <article class="finance-card @(income ? "income" : "expense")">
+                <div class="finance-type-icon">@(income ? "↗" : "↘")</div>
+                <div class="finance-card-main"><div class="finance-card-title"><div><span class="transaction-type">@(income ? "รายรับ" : "ค่าใช้จ่าย")</span><h3>@item.Description</h3></div><strong class="transaction-amount">@(income ? "+" : "−")฿@item.Amount.ToString("N2")</strong></div><div class="finance-meta"><span>@item.TransactionDate.Day @thaiMonths[item.TransactionDate.Month - 1] @(item.TransactionDate.Year + 543)</span><span>@item.CategoryName</span><span>@item.BuildingName</span><span>@item.PaymentMethodName</span>@if(!string.IsNullOrWhiteSpace(item.Counterparty)){<span>@item.Counterparty</span>}</div></div>
+                <div class="finance-card-actions">@if(item.FirstReceiptId.HasValue){<a class="btn btn-soft btn-sm" asp-action="Receipt" asp-route-id="@item.FirstReceiptId">หลักฐาน @(item.ReceiptCount > 1 ? item.ReceiptCount : "")</a>}<a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@item.Id">แก้ไข</a><form method="post" asp-action="Delete" asp-route-id="@item.Id" data-finance-delete data-name="@item.Description"><button type="submit" class="btn btn-link text-danger btn-sm">ลบ</button></form></div>
+            </article>
+        }
+        </div>
+    }
+</section>
+@section Scripts { <script src="~/js/finance-index.js" asp-append-version="true"></script> }

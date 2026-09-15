@@ -1599,6 +1599,230 @@ GO
 BEGIN TRANSACTION;
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    DECLARE @var9 nvarchar(max);
+    SELECT @var9 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[FinancialTransactions]') AND [c].[name] = N'ReferenceNumber');
+    IF @var9 IS NOT NULL EXEC(N'ALTER TABLE [FinancialTransactions] DROP CONSTRAINT ' + @var9 + ';');
+    ALTER TABLE [FinancialTransactions] ALTER COLUMN [ReferenceNumber] nvarchar(100) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    DECLARE @var10 nvarchar(max);
+    SELECT @var10 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[FinancialTransactions]') AND [c].[name] = N'Description');
+    IF @var10 IS NOT NULL EXEC(N'ALTER TABLE [FinancialTransactions] DROP CONSTRAINT ' + @var10 + ';');
+    ALTER TABLE [FinancialTransactions] ALTER COLUMN [Description] nvarchar(500) NOT NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    ALTER TABLE [FinancialTransactions] ADD [AccountId] uniqueidentifier NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    ALTER TABLE [FinancialTransactions] ADD [Counterparty] nvarchar(200) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    ALTER TABLE [FinancialTransactions] ADD [Notes] nvarchar(2000) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    ALTER TABLE [FinancialTransactions] ADD [PaymentMethod] int NOT NULL DEFAULT 2;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    DECLARE @var11 nvarchar(max);
+    SELECT @var11 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[ExpenseCategories]') AND [c].[name] = N'Name');
+    IF @var11 IS NOT NULL EXEC(N'ALTER TABLE [ExpenseCategories] DROP CONSTRAINT ' + @var11 + ';');
+    ALTER TABLE [ExpenseCategories] ALTER COLUMN [Name] nvarchar(150) NOT NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    ALTER TABLE [ExpenseCategories] ADD [AccountId] uniqueidentifier NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    ALTER TABLE [ExpenseCategories] ADD [IsSystem] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    ALTER TABLE [ExpenseCategories] ADD [Type] int NOT NULL DEFAULT 2;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    CREATE TABLE [TransactionReceipts] (
+        [Id] uniqueidentifier NOT NULL,
+        [AccountId] uniqueidentifier NOT NULL,
+        [FinancialTransactionId] uniqueidentifier NOT NULL,
+        [StorageKey] nvarchar(260) NOT NULL,
+        [OriginalFileName] nvarchar(255) NOT NULL,
+        [ContentType] nvarchar(100) NOT NULL,
+        [SizeBytes] bigint NOT NULL,
+        [Sha256] char(64) NOT NULL,
+        [CreatedAt] datetimeoffset(0) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [UpdatedAt] datetimeoffset NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [IsDeleted] bit NOT NULL,
+        CONSTRAINT [PK_TransactionReceipts] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TransactionReceipts_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_TransactionReceipts_FinancialTransactions_FinancialTransactionId] FOREIGN KEY ([FinancialTransactionId]) REFERENCES [FinancialTransactions] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    CREATE INDEX [IX_FinancialTransactions_AccountId_TransactionDate_Type] ON [FinancialTransactions] ([AccountId], [TransactionDate], [Type]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    CREATE INDEX [IX_FinancialTransactions_BuildingId] ON [FinancialTransactions] ([BuildingId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    CREATE INDEX [IX_FinancialTransactions_ExpenseCategoryId] ON [FinancialTransactions] ([ExpenseCategoryId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    EXEC(N'ALTER TABLE [FinancialTransactions] ADD CONSTRAINT [CK_FinancialTransactions_Amount] CHECK ([Amount] > 0)');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_ExpenseCategories_AccountId_Type_Name] ON [ExpenseCategories] ([AccountId], [Type], [Name]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    CREATE INDEX [IX_TransactionReceipts_AccountId] ON [TransactionReceipts] ([AccountId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    CREATE INDEX [IX_TransactionReceipts_FinancialTransactionId] ON [TransactionReceipts] ([FinancialTransactionId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    ALTER TABLE [ExpenseCategories] ADD CONSTRAINT [FK_ExpenseCategories_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts] ([Id]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    ALTER TABLE [FinancialTransactions] ADD CONSTRAINT [FK_FinancialTransactions_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [Accounts] ([Id]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    ALTER TABLE [FinancialTransactions] ADD CONSTRAINT [FK_FinancialTransactions_BirdBuildings_BuildingId] FOREIGN KEY ([BuildingId]) REFERENCES [BirdBuildings] ([Id]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    ALTER TABLE [FinancialTransactions] ADD CONSTRAINT [FK_FinancialTransactions_ExpenseCategories_ExpenseCategoryId] FOREIGN KEY ([ExpenseCategoryId]) REFERENCES [ExpenseCategories] ([Id]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260910043828_AddAccountFinanceAndReceipts'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260910043828_AddAccountFinanceAndReceipts', N'10.0.9');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
     WHERE [MigrationId] = N'20260910050000_AddBuildingPhoto'
 )
 BEGIN

@@ -6,6 +6,7 @@ public enum HarvestStatus { Draft = 0, Confirmed = 1, Closed = 2 }
 public enum SaleStatus { Draft = 0, Confirmed = 1, Cancelled = 2 }
 public enum PaymentStatus { Unpaid = 0, PartiallyPaid = 1, Paid = 2, Overdue = 3 }
 public enum TransactionType { Income = 1, Expense = 2 }
+public enum PaymentMethod { Cash = 1, BankTransfer = 2, CreditCard = 3, Other = 9 }
 public enum MaintenanceType { Corrective = 1, Preventive = 2 }
 public enum MaintenancePriority { Low = 1, Normal = 2, High = 3, Urgent = 4 }
 public enum MaintenanceStatus { Reported = 1, InProgress = 2, AwaitingAcceptance = 3, Completed = 4, Cancelled = 5 }

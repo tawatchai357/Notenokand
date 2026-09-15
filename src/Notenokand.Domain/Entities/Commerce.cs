@@ -46,14 +46,18 @@ public sealed class SaleItem : Entity
 
 public sealed class ExpenseCategory : Entity
 {
+    public Guid AccountId { get; set; }
     public required Guid OwnerUserId { get; set; }
     public required string Name { get; set; }
+    public TransactionType Type { get; set; } = TransactionType.Expense;
+    public bool IsSystem { get; set; }
     public int SortOrder { get; set; }
     public bool IsActive { get; set; } = true;
 }
 
 public sealed class FinancialTransaction : Entity
 {
+    public Guid AccountId { get; set; }
     public required Guid OwnerUserId { get; set; }
     public Guid? BuildingId { get; set; }
     public Guid? HarvestRoundId { get; set; }
@@ -66,4 +70,20 @@ public sealed class FinancialTransaction : Entity
     public required string Description { get; set; }
     public decimal Amount { get; set; }
     public string? ReferenceNumber { get; set; }
+    public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.BankTransfer;
+    public string? Counterparty { get; set; }
+    public string? Notes { get; set; }
+    public ICollection<TransactionReceipt> Receipts { get; set; } = [];
+}
+
+public sealed class TransactionReceipt : Entity
+{
+    public Guid AccountId { get; set; }
+    public Guid FinancialTransactionId { get; set; }
+    public required string StorageKey { get; set; }
+    public required string OriginalFileName { get; set; }
+    public required string ContentType { get; set; }
+    public long SizeBytes { get; set; }
+    public required string Sha256 { get; set; }
+    public FinancialTransaction FinancialTransaction { get; set; } = null!;
 }

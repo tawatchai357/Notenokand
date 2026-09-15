@@ -6,10 +6,13 @@
 
 - หน้า Landing, สมัครสมาชิก, ยืนยันอีเมล, เข้าสู่ระบบ และออกจากระบบ
 - Onboarding สร้างบัญชีกิจการและตึกนกแห่งแรก
+- อัปโหลดรูปตึกนกได้ 1 รูปต่อหลัง พร้อมพรีวิวและเก็บไฟล์แบบ private
+- บันทึกรายรับ–ค่าใช้จ่าย หมวดหมู่ หลักฐาน และสรุปยอดรายเดือนแบบ Card View
 - Dropdown ที่อยู่ไทยแบบ จังหวัด → อำเภอ/เขต → ตำบล/แขวง → รหัสไปรษณีย์
 - Dashboard แสดงตึกนกแบบ Card View พร้อมกรองสถานะ แก้ไข และเปิด/ปิดการใช้งาน
 - เพิ่มและแก้ไขตึกพร้อมที่อยู่ไทย พิกัด และแผนที่ OpenStreetMap
 - Dashboard แบบ responsive สำหรับมือถือ แท็บเล็ต และ PC
+- Footer Navigation สำหรับมือถือ/แท็บเล็ต พร้อม Quick Add และ safe area
 - ASP.NET Core Identity พร้อมยืนยันอีเมล, lockout, anti-forgery และ rate limit แยกตาม IP
 - SQL Server schema และ idempotent migration script
 

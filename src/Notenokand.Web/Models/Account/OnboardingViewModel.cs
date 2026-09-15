@@ -53,6 +53,9 @@ public sealed class DashboardViewModel
 {
     public required string AccountName { get; init; }
     public int BuildingCount { get; init; }
+    public decimal TotalIncomeThisMonth { get; init; }
+    public decimal TotalExpenseThisMonth { get; init; }
+    public decimal NetThisMonth => TotalIncomeThisMonth - TotalExpenseThisMonth;
     public string DisplayName { get; init; } = string.Empty;
     public IReadOnlyList<Notenokand.Web.Models.Buildings.BuildingCardViewModel> Buildings { get; init; } = [];
 }

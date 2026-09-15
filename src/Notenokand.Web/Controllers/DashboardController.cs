@@ -36,11 +36,20 @@ public sealed class DashboardController(NotenokandDbContext db, UserManager<Appl
             Location = BuildLocation(x.SubdistrictCode, x.DistrictCode, x.Province, x.PostalCode, subdistricts, districts)
         }).ToList();
 
+        var today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(7));
+        var monthStart = new DateOnly(today.Year, today.Month, 1);
+        var monthEnd = monthStart.AddMonths(1);
+        var monthTransactions = db.FinancialTransactions.AsNoTracking().Where(x => x.AccountId == membership.AccountId && !x.IsDeleted && x.TransactionDate >= monthStart && x.TransactionDate < monthEnd);
+        var totalIncome = await monthTransactions.Where(x => x.Type == Notenokand.Domain.Enums.TransactionType.Income).SumAsync(x => (decimal?)x.Amount) ?? 0;
+        var totalExpense = await monthTransactions.Where(x => x.Type == Notenokand.Domain.Enums.TransactionType.Expense).SumAsync(x => (decimal?)x.Amount) ?? 0;
+
         return View(new DashboardViewModel
         {
             AccountName = membership.Account.Name,
             DisplayName = user.DisplayName,
             BuildingCount = buildings.Count,
+            TotalIncomeThisMonth = totalIncome,
+            TotalExpenseThisMonth = totalExpense,
             Buildings = buildings
         });
     }

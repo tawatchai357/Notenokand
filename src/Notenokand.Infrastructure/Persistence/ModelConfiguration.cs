@@ -101,9 +101,45 @@ public sealed class SaleItemConfiguration : IEntityTypeConfiguration<SaleItem>
     }
 }
 
+public sealed class ExpenseCategoryConfiguration : IEntityTypeConfiguration<ExpenseCategory>
+{
+    public void Configure(EntityTypeBuilder<ExpenseCategory> b)
+    {
+        b.Property(x => x.Name).HasMaxLength(150);
+        b.HasIndex(x => new { x.AccountId, x.Type, x.Name }).IsUnique();
+        b.HasOne<Account>().WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
 public sealed class FinancialTransactionConfiguration : IEntityTypeConfiguration<FinancialTransaction>
 {
-    public void Configure(EntityTypeBuilder<FinancialTransaction> b) => b.Property(x => x.Amount).HasPrecision(18, 2);
+    public void Configure(EntityTypeBuilder<FinancialTransaction> b)
+    {
+        b.Property(x => x.Amount).HasPrecision(18, 2);
+        b.Property(x => x.Description).HasMaxLength(500);
+        b.Property(x => x.ReferenceNumber).HasMaxLength(100);
+        b.Property(x => x.Counterparty).HasMaxLength(200);
+        b.Property(x => x.Notes).HasMaxLength(2000);
+        b.HasIndex(x => new { x.AccountId, x.TransactionDate, x.Type });
+        b.HasOne<Account>().WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Restrict);
+        b.HasOne<BirdBuilding>().WithMany().HasForeignKey(x => x.BuildingId).OnDelete(DeleteBehavior.Restrict);
+        b.HasOne<ExpenseCategory>().WithMany().HasForeignKey(x => x.ExpenseCategoryId).OnDelete(DeleteBehavior.Restrict);
+        b.ToTable(t => t.HasCheckConstraint("CK_FinancialTransactions_Amount", "[Amount] > 0"));
+    }
+}
+
+public sealed class TransactionReceiptConfiguration : IEntityTypeConfiguration<TransactionReceipt>
+{
+    public void Configure(EntityTypeBuilder<TransactionReceipt> b)
+    {
+        b.Property(x => x.StorageKey).HasMaxLength(260);
+        b.Property(x => x.OriginalFileName).HasMaxLength(255);
+        b.Property(x => x.ContentType).HasMaxLength(100);
+        b.Property(x => x.Sha256).HasColumnType("char(64)");
+        b.HasIndex(x => x.FinancialTransactionId);
+        b.HasOne(x => x.FinancialTransaction).WithMany(x => x.Receipts).HasForeignKey(x => x.FinancialTransactionId).OnDelete(DeleteBehavior.Cascade);
+        b.HasOne<Account>().WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Restrict);
+    }
 }
 
 public sealed class QualityStandardConfiguration : IEntityTypeConfiguration<QualityStandard>
