@@ -1,0 +1,46 @@
+{
+  "id": "./",
+  "name": "Notenokand — จัดการตึกนก",
+  "short_name": "Notenokand",
+  "description": "จัดการตึกนก รายรับรายจ่าย ผลผลิต และสต็อกรังนก",
+  "lang": "th",
+  "start_url": "./app",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f9fd",
+  "theme_color": "#1565d8",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "บันทึกการเก็บรังนก",
+      "url": "./app/harvest/create"
+    },
+    {
+      "name": "สต็อกรังนก",
+      "url": "./app/stock"
+    },
+    {
+      "name": "นัดหมาย",
+      "url": "./app/calendar"
+    }
+  ]
+}

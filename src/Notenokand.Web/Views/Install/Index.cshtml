@@ -1,0 +1,13 @@
+@{ ViewData["Title"] = "ติดตั้งแอปบนมือถือ"; }
+<section class="install-page">
+<div class="content-card"><img class="install-icon" src="~/icons/icon-192.png" width="80" height="80" alt="Notenokand" /><h1>Notenokand บนมือถือ</h1><p>เพิ่มลงหน้าจอหลัก แล้วเปิดใช้งานในหน้าต่างแอป พร้อมเมนูด้านล่าง</p>
+<p data-pwa-installed hidden class="text-success">คุณกำลังเปิดในโหมดแอปแล้ว</p>
+<button class="btn btn-primary" type="button" data-install-pwa hidden>ติดตั้ง Notenokand</button>
+<p data-pwa-insecure hidden class="text-danger mt-3">การเชื่อมต่อนี้ยังไม่ปลอดภัย ต้องใช้ HTTPS ที่อุปกรณ์เชื่อถือได้ จึงจะติดตั้ง PWA ได้</p>
+<p class="muted mt-3">หากไม่เห็นปุ่มติดตั้ง ให้ใช้เมนูของเบราว์เซอร์ตามวิธีด้านล่าง ปุ่มนี้ขึ้นอยู่กับอุปกรณ์และเบราว์เซอร์</p></div>
+<div class="install-grid">
+<article class="content-card"><h2>Android</h2><ol><li>เปิดเว็บนี้ด้วย Chrome</li><li>แตะ “ติดตั้ง Notenokand” เมื่อปุ่มแสดง หรือเปิดเมนู ⋮</li><li>เลือก “ติดตั้งแอป” หรือ “เพิ่มลงในหน้าจอหลัก” แล้วทำตามข้อความบนหน้าจอ</li></ol></article>
+<article class="content-card"><h2>iPhone / iPad</h2><ol><li>เปิดเว็บนี้ด้วย Safari</li><li>แตะเมนูแชร์ แล้วเลือก “เพิ่มไปยังหน้าจอโฮม”</li><li>หากมีตัวเลือก “เปิดเป็นเว็บแอป” ให้เปิดไว้ แล้วแตะ “เพิ่ม”</li></ol></article>
+</div>
+<div class="content-card mt-3"><h2>ก่อนใช้งาน</h2><ul><li>ต้องเชื่อมต่ออินเทอร์เน็ตเพื่อดูข้อมูลล่าสุดและบันทึกรายการ</li><li>การขายและข้อมูลส่วนตัวจะไม่ถูกเก็บไว้สำหรับเปิดแบบออฟไลน์</li><li>ยังไม่มี Push แจ้งเตือนขณะปิดแอป</li><li>หากเปิดจากคอมพิวเตอร์ในวง LAN ต้องตั้งค่า HTTPS และใบรับรองที่มือถือเชื่อถือก่อน</li></ul><a class="btn btn-soft" asp-controller="Dashboard" asp-action="Index">กลับเข้าใช้งาน</a></div>
+</section>

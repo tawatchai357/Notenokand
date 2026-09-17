@@ -10,6 +10,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1565d8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Notenokand" />
+  <link rel="manifest" href="~/manifest.webmanifest" />
+  <link rel="apple-touch-icon" sizes="180x180" href="~/icons/apple-touch-icon.png" />
   <title>@ViewData["Title"] - Notenokand</title>
   <meta name="description" content="ระบบจัดการค่าใช้จ่าย ผลผลิต สต็อก และยอดขายสำหรับกิจการบ้านนกแอ่น" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,10 +25,12 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
   <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
   <link rel="stylesheet" href="~/css/appointment-notifications.css" asp-append-version="true" />
+  <link rel="stylesheet" href="~/css/pwa.css" asp-append-version="true" />
   <link rel="stylesheet" href="~/Notenokand.Web.styles.css" asp-append-version="true" />
   @await RenderSectionAsync("Head", required: false)
 </head>
 <body class="@renderedBodyClass">
+<partial name="_PwaStatus" />
 @if (showChrome)
 {
   <header class="site-header"><nav class="container nav-shell"><a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">N</span><span>NOTENOKAND</span></a><div class="nav-links d-none d-md-flex"><a href="/#features">ความสามารถ</a><a href="#">เกี่ยวกับเรา</a></div><div class="nav-actions">@if (User.Identity?.IsAuthenticated == true) { @await Component.InvokeAsync("AppointmentAlerts") <a class="btn btn-soft d-none d-sm-inline-flex" asp-controller="Dashboard" asp-action="Index">ภาพรวม</a><a class="btn btn-soft d-none d-md-inline-flex" asp-controller="Finance" asp-action="Index">รายรับ–ค่าใช้จ่าย</a><a class="btn btn-soft d-none d-lg-inline-flex" asp-controller="Calendar" asp-action="Index">ปฏิทิน</a><form asp-controller="Account" asp-action="Logout" method="post"><button class="btn btn-link" type="submit">ออกจากระบบ</button></form> } else { <a class="login-link" asp-controller="Account" asp-action="Login">เข้าสู่ระบบ</a><a class="btn btn-primary" asp-controller="Account" asp-action="Register">เริ่มใช้งาน</a> }</div></nav></header>
@@ -38,6 +46,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="~/js/thai-datetime-picker.js" asp-append-version="true"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/pwa.js" asp-append-version="true" data-sw-url="@Url.Content("~/sw.js")"></script>
 @if (TempData["SuccessMessage"] is string successMessage) { <script>window.notenokandAlert = @Html.Raw(JsonSerializer.Serialize(successMessage));</script> }
 @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -1,0 +1,22 @@
+.pwa-status { background:#fff3ce; color:#674d00; text-align:center; padding:.65rem 1rem; font-size:.88rem; }
+.pwa-update { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:.5rem; padding:.5rem; background:#eaf3ff; }
+.pwa-update[hidden],.pwa-status[hidden],[data-install-pwa][hidden] { display:none!important; }
+.install-page { max-width:900px; margin:1.5rem auto; }
+.install-icon { border-radius:20px; margin-bottom:1rem; }
+.install-page h1 { font-size:1.7rem; }
+.install-page h2 { font-size:1.2rem; }
+.install-page li { margin-bottom:.7rem; }
+.install-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; margin-top:1rem; }
+@media(max-width:991px) {
+    .has-app-footer .site-footer { display:none; }
+    input.form-control,select.form-select,textarea.form-control { font-size:16px; }
+    .btn,.form-select { min-height:44px; }
+    .has-app-footer .app-main { padding-bottom:1rem; }
+}
+@media(max-width:575px) { .install-grid { grid-template-columns:1fr; } }
+@media(display-mode:standalone) {
+    body { min-height:100dvh; }
+    .site-header { height:calc(68px + env(safe-area-inset-top)); padding-top:env(safe-area-inset-top); }
+    .app-main { padding-left:max(.75rem,env(safe-area-inset-left)); padding-right:max(.75rem,env(safe-area-inset-right)); }
+    .has-app-footer .site-footer { display:none; }
+}
