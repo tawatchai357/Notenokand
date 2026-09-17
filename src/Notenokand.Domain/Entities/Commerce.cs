@@ -15,6 +15,9 @@ public sealed class Buyer : Entity
 
 public sealed class Sale : Entity
 {
+    public Guid? AccountId { get; set; }
+    public string? SaleLocation { get; set; }
+    public string? Notes { get; set; }
     public required Guid OwnerUserId { get; set; }
     public required string DocumentNumber { get; set; }
     public DateOnly SaleDate { get; set; }

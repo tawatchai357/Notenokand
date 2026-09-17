@@ -80,6 +80,10 @@ public sealed class DashboardController(NotenokandDbContext db, UserManager<Appl
             AccountName = membership.Account.Name,
             DisplayName = user.DisplayName,
             BuildingCount = buildings.Count,
+            RemainingStockKg = await db.HarvestItems.AsNoTracking()
+                .Where(x => !x.IsDeleted && !x.HarvestRound.IsDeleted && !x.HarvestRound.Building.IsDeleted &&
+                    x.HarvestRound.Building.AccountId == membership.AccountId && x.HarvestRound.Status != Notenokand.Domain.Enums.HarvestStatus.Draft)
+                .SumAsync(x => (decimal?)x.RemainingWeightKg) ?? 0m,
             TotalIncomeThisMonth = totalIncome,
             TotalExpenseThisMonth = totalExpense,
             FinanceYear = selectedYear,

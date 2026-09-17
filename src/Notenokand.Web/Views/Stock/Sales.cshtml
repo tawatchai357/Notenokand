@@ -1,0 +1,11 @@
+@model IReadOnlyList<Notenokand.Domain.Entities.Sale>
+@using Notenokand.Domain.Enums
+@{ ViewData["Title"] = "ประวัติขายจากล็อต"; var page = (int)(ViewData["Page"] ?? 1); }
+@section Head { <link rel="stylesheet" href="~/css/stock.css" asp-append-version="true" /> }
+<section class="stock-page"><div class="stock-heading"><h1>ประวัติขายจากล็อต</h1><a class="btn btn-soft" asp-action="Index">กลับสต็อก</a></div>
+@if (Model.Count == 0) { <div class="content-card empty-state">ยังไม่มีรายการขายในหน้านี้</div> }
+@foreach (var sale in Model) {
+<a class="content-card stock-sale-card" asp-action="Details" asp-route-id="@sale.Id"><small>@sale.DocumentNumber</small><h2>@sale.Buyer.Name</h2><p>@sale.SaleDate.ToString("d MMM yyyy", new System.Globalization.CultureInfo("th-TH")) · @sale.SaleLocation</p><strong>@sale.NetAmount.ToString("N2") บาท</strong><span class="@(sale.Status == SaleStatus.Cancelled ? "text-danger" : "text-success")">@(sale.Status == SaleStatus.Cancelled ? "ยกเลิกแล้ว" : "รับเงินครบแล้ว")</span></a>
+}
+<div class="stock-actions mt-3">@if(page > 1){<a class="btn btn-soft" asp-action="Sales" asp-route-page="@(page - 1)">ก่อนหน้า</a>}<span>หน้า @(page)</span>@if((bool)(ViewData["HasNext"] ?? false)){<a class="btn btn-soft" asp-action="Sales" asp-route-page="@(page + 1)">ถัดไป</a>}</div>
+</section>

@@ -115,6 +115,7 @@ public sealed class FinanceController(NotenokandDbContext db, UserManager<Applic
         var context = await GetAccountContextAsync(); if (context is null) return Forbid();
         var entity = await db.FinancialTransactions.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id && x.AccountId == context.Value.AccountId && !x.IsDeleted);
         if (entity is null) return NotFound();
+        if (entity.SaleId.HasValue) return RedirectToAction("Details", "Stock", new { id = entity.SaleId.Value });
         var model = new FinanceEditViewModel
         {
             Id = entity.Id, Type = entity.Type, TransactionDate = entity.TransactionDate, Description = entity.Description,
@@ -133,6 +134,7 @@ public sealed class FinanceController(NotenokandDbContext db, UserManager<Applic
     {
         var context = await GetAccountContextAsync(); if (context is null) return Forbid();
         var entity = await db.FinancialTransactions.SingleOrDefaultAsync(x => x.Id == id && x.AccountId == context.Value.AccountId && !x.IsDeleted);
+        if (entity?.SaleId is Guid linkedSaleId) return RedirectToAction("Details", "Stock", new { id = linkedSaleId });
         if (entity is null) return NotFound();
         model.Id = id; var isBirdNestSale = await ValidateEditorAsync(model, context.Value.AccountId, entity.BuildingId);
         if (!ModelState.IsValid) { await LoadEditorOptionsAsync(model, context.Value.AccountId, entity.BuildingId); model.ExistingReceipts = await LoadReceiptsAsync(context.Value.AccountId, id); return View(model); }
@@ -159,6 +161,7 @@ public sealed class FinanceController(NotenokandDbContext db, UserManager<Applic
     {
         var context = await GetAccountContextAsync(); if (context is null) return Forbid();
         var entity = await db.FinancialTransactions.SingleOrDefaultAsync(x => x.Id == id && x.AccountId == context.Value.AccountId && !x.IsDeleted);
+        if (entity?.SaleId is Guid linkedSaleId) return RedirectToAction("Details", "Stock", new { id = linkedSaleId });
         if (entity is null) return NotFound();
         entity.IsDeleted = true; entity.UpdatedAt = DateTimeOffset.UtcNow; entity.UpdatedByUserId = context.Value.UserId;
         await db.SaveChangesAsync(); TempData["SuccessMessage"] = "ลบรายการแล้ว"; return RedirectToAction(nameof(Index));

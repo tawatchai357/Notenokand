@@ -51,6 +51,7 @@ public sealed class OnboardingViewModel
 
 public sealed class DashboardViewModel
 {
+    public decimal RemainingStockKg { get; init; }
     public required string AccountName { get; init; }
     public int BuildingCount { get; init; }
     public decimal TotalIncomeThisMonth { get; init; }

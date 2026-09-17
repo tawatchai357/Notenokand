@@ -1,0 +1,15 @@
+.stock-page { max-width:1000px; margin:1rem auto; overflow-wrap:anywhere; }
+.stock-heading,.stock-actions { display:flex; align-items:center; justify-content:space-between; gap:.75rem; flex-wrap:wrap; }
+.stock-heading h2,.stock-page article h2 { font-size:1.2rem; }
+.stock-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; }
+.stock-metrics > div { padding:1rem; background:#fff; border:1px solid #dce8f7; border-radius:16px; }
+.stock-metrics strong,.stock-item small,.stock-item > div > strong { display:block; }
+.stock-metrics strong { margin-top:.5rem; color:#155ebc; }
+.stock-lot,.stock-sale-card { margin-top:1rem; }
+.stock-item { border-top:1px solid #dce8f7; padding-top:1rem; margin-top:1rem; display:flex; gap:1rem; justify-content:space-between; flex-wrap:wrap; }
+.stock-item p { margin:.3rem 0; }
+.stock-sale-card { display:block; text-decoration:none; color:#173655; }
+.stock-sale-card span { display:block; margin-top:.5rem; }
+.stock-note { white-space:pre-wrap; }
+.stock-line .form-select { width:100%; text-overflow:ellipsis; }
+@media(max-width:575px) { .stock-metrics { grid-template-columns:minmax(0,1fr); } }

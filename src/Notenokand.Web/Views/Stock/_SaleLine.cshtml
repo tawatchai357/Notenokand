@@ -1,0 +1,14 @@
+@model Notenokand.Web.Models.Stock.SaleCreateViewModel
+@{ var i = (int)(ViewData["LineIndex"] ?? 0); }
+<section class="form-card stock-line mb-3" data-sale-line>
+<div class="stock-heading"><h2 class="h5">รายการ <span data-line-number>@(i + 1)</span></h2><button class="btn btn-outline-danger" type="button" data-remove-sale-line>ลบแถว</button></div>
+<div class="row g-3">
+<div class="col-12"><label asp-for="Items[i].HarvestItemId">เลือกตึก / ล็อต / ประเภทรัง</label><select asp-for="Items[i].HarvestItemId" class="form-select" required data-stock-select><option value="">เลือกสินค้าจากล็อต</option>
+@foreach (var item in Model.Stock.Items.Where(x => x.RemainingWeightKg > 0 || x.Id == Model.Items[i].HarvestItemId)) {
+<option value="@item.Id" data-remaining="@item.RemainingWeightKg.ToString(System.Globalization.CultureInfo.InvariantCulture)">@Model.Stock.Label(item)</option>
+}
+</select><span asp-validation-for="Items[i].HarvestItemId"></span></div>
+<div class="col-sm-6"><label asp-for="Items[i].WeightKg">ขายน้ำหนัก (กก.)</label><input asp-for="Items[i].WeightKg" class="form-control" type="number" min="0.001" max="99999999" step="0.001" required data-sale-weight /><span asp-validation-for="Items[i].WeightKg"></span></div>
+<div class="col-sm-6"><label asp-for="Items[i].PricePerKg">ราคา / กก. (บาท)</label><input asp-for="Items[i].PricePerKg" class="form-control" type="number" min="0.01" max="99999999" step="0.01" required data-sale-price /><span asp-validation-for="Items[i].PricePerKg"></span></div>
+<div class="col-12">ยอดรายการ <strong data-line-amount>@Model.Items[i].Amount.ToString("N2")</strong> บาท</div>
+</div></section>

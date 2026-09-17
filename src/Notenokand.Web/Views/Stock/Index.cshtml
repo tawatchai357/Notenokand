@@ -1,0 +1,19 @@
+@model Notenokand.Web.Models.Stock.StockPageViewModel
+@using System.Globalization
+@{ ViewData["Title"] = "สต็อกรังนก"; var thai = new CultureInfo("th-TH"); }
+@section Head { <link rel="stylesheet" href="~/css/stock.css" asp-append-version="true" /> }
+<section class="stock-page">
+<div class="stock-heading"><div><span class="eyebrow">จากการเก็บสู่การขาย</span><h1>สต็อกรังนก</h1></div><div class="stock-actions"><a class="btn btn-soft" asp-action="Sales">ประวัติขาย</a><a class="btn btn-primary" asp-action="Create">+ ขายจากล็อต</a></div></div>
+<div class="stock-metrics"><div><small>รับเข้ารวม</small><strong>@Model.ReceivedKg.ToString("N3") กก.</strong></div><div><small>ขายแล้วสุทธิ</small><strong>@Model.SoldKg.ToString("N3") กก.</strong></div><div><small>คงเหลือพร้อมขาย</small><strong>@Model.RemainingKg.ToString("N3") กก.</strong></div></div>
+<p class="muted mt-3">แต่ละครั้งที่เก็บเป็นหนึ่งล็อต · รายรับที่เคยบันทึกแยกไว้จะไม่ตัดสต็อกย้อนหลัง</p>
+@if (Model.Items.Count == 0) { <div class="content-card empty-state"><h2>ยังไม่มีล็อตรังนก</h2><a class="btn btn-primary" asp-controller="Harvest" asp-action="Create">บันทึกการเก็บรังนก</a></div> }
+@foreach (var lot in Model.Items.GroupBy(x => x.HarvestRoundId)) {
+var round = lot.First().HarvestRound;
+<article class="content-card stock-lot"><div class="stock-heading"><div><a asp-controller="Buildings" asp-action="Details" asp-route-id="@round.BuildingId">@round.Building.Name</a><h2>เก็บวันที่ @round.HarvestedOn.ToString("d MMM yyyy", thai)</h2><small class="muted">ล็อต @round.RoundNumber</small></div></div>
+@foreach (var item in lot) {
+<div class="stock-item"><div><strong>@Model.Name(item.NestTypeId)</strong><p>@Model.Name(item.ColorId) · @Model.Name(item.ConditionId)</p><small>รับเข้า @item.WeightKg.ToString("N3") · ขายแล้ว @((item.WeightKg - item.RemainingWeightKg).ToString("N3")) กก.</small></div><div><strong>เหลือ @item.RemainingWeightKg.ToString("N3") กก.</strong>
+@if (item.RemainingWeightKg > 0) { <a class="btn btn-soft mt-2" asp-action="Create" asp-route-itemId="@item.Id">ขายรายการนี้</a> } else { <small class="text-muted">หมดแล้ว</small> }</div></div>
+}
+</article>
+}
+</section>

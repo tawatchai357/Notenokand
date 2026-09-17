@@ -83,6 +83,10 @@ public sealed class SaleConfiguration : IEntityTypeConfiguration<Sale>
 {
     public void Configure(EntityTypeBuilder<Sale> b)
     {
+        b.HasIndex(x => new { x.AccountId, x.SaleDate });
+        b.HasOne<Account>().WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Restrict);
+        b.Property(x => x.SaleLocation).HasMaxLength(300);
+        b.Property(x => x.Notes).HasMaxLength(2000);
         b.HasIndex(x => new { x.OwnerUserId, x.DocumentNumber }).IsUnique();
         b.Property(x => x.DocumentNumber).HasMaxLength(50);
         foreach (var name in new[] { nameof(Sale.Subtotal), nameof(Sale.DiscountAmount), nameof(Sale.ReturnAmount), nameof(Sale.NetAmount), nameof(Sale.PaidAmount) })

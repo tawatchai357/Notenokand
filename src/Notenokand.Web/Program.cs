@@ -32,6 +32,7 @@ builder.Services.AddDataProtection()
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddSingleton<Notenokand.Web.Services.BuildingPhotoStorage>();
 builder.Services.AddScoped<Notenokand.Web.Services.AppointmentNotificationService>();
+builder.Services.AddScoped<Notenokand.Web.Services.LotSaleService>();
 
 var app = builder.Build();
 
