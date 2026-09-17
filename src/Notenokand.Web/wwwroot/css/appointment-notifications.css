@@ -1,0 +1,18 @@
+.appointment-alert-link { display:inline-flex; align-items:center; gap:.45rem; padding:.5rem .7rem; border:1px solid #d6e6ff; background:#f2f7ff; border-radius:12px; text-decoration:none; white-space:nowrap; }
+.appointment-alert-link svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; }
+.appointment-alert-link b { background:#1663d5; color:white; border-radius:20px; padding:.1rem .45rem; font-size:.75rem; }
+.appointment-alert-link b.alert-overdue { background:#c83240; }
+.notification-page { max-width:900px; margin:1rem auto; overflow-wrap:anywhere; }
+.notification-heading { display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+.notification-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.6rem; }
+.notification-summary > div { background:#fff; border:1px solid #dce8f7; border-radius:16px; padding:1rem .7rem; }
+.notification-summary strong { display:block; font-size:1.7rem; }
+.notification-group { margin-top:1.7rem; }
+.notification-group h2 { font-size:1.3rem; }
+.notification-card { margin-bottom:1rem; border-left:4px solid #2675e7; }
+.notification-card.overdue { border-left-color:#c83240; }
+.notification-card h3 { font-size:1.15rem; margin:.5rem 0; }
+.notification-card p { margin:.4rem 0; }
+.notification-note { white-space:pre-wrap; color:#607898; }
+.notification-actions { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:1rem; }
+@media(max-width:575px) { .appointment-alert-link > span { display:none; } .site-header .nav-shell { gap:.4rem; } .site-header .nav-actions { gap:.35rem; } }
