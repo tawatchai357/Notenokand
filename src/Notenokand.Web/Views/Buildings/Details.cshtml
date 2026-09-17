@@ -1,0 +1,90 @@
+@model Notenokand.Web.Models.Buildings.BuildingDetailsViewModel
+@using Notenokand.Domain.Enums
+@using System.Globalization
+@section Head { <link rel="stylesheet" href="~/css/building-details.css" asp-append-version="true" /> }
+@{
+    var building = Model.Building;
+    ViewData["Title"] = building.Name;
+    var thai = new CultureInfo("th-TH");
+    var today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(7));
+    string Name(Guid? id) => id.HasValue && Model.OptionNames.TryGetValue(id.Value, out var name) ? name : "ไม่ระบุ";
+}
+<section class="building-detail">
+    <a class="btn btn-soft mb-3" href="@Url.Action("Index", "Dashboard")#buildings">‹ กลับรายการตึกนก</a>
+    <div class="editor-heading">
+        <div><span class="eyebrow">@building.Code</span><h1>@building.Name</h1><span class="status-badge @(building.Status == BuildingStatus.Active ? "active" : "inactive")">@(building.Status == BuildingStatus.Active ? "ใช้งาน" : "ไม่ใช้งาน")</span></div>
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@building.Id">แก้ไขข้อมูลตึก</a>
+    </div>
+    <nav class="detail-tabs" aria-label="ส่วนข้อมูลตึก"><a href="#building-info">ข้อมูลตึก</a><a href="#building-finance">การเงิน</a><a href="#building-harvest">เก็บรังนก</a><a href="#building-appointments">นัดหมาย</a></nav>
+    <section id="building-info" class="content-card detail-section">
+        <h2>ข้อมูลตึกนก</h2>
+        @if (!string.IsNullOrWhiteSpace(building.PhotoStorageKey)) {
+            <img class="detail-photo" src="@Url.Action("Photo", new { id = building.Id })" alt="รูปตึก @building.Name" />
+        }
+        <p class="mt-3">@(string.IsNullOrWhiteSpace(Model.Location) ? "ยังไม่ระบุที่อยู่" : Model.Location)</p>
+        @if (building.Latitude.HasValue && building.Longitude.HasValue) {
+            var lat = building.Latitude.Value.ToString(CultureInfo.InvariantCulture);
+            var lon = building.Longitude.Value.ToString(CultureInfo.InvariantCulture);
+            <a class="btn btn-soft mb-3" href="https://www.openstreetmap.org/?mlat=@lat&amp;mlon=@lon#map=17/@lat/@lon" target="_blank" rel="noopener">ดูตำแหน่งบนแผนที่ ↗</a>
+        }
+        <dl class="detail-facts">
+            <div><dt>หน้ากว้าง / ความลึก</dt><dd>@(building.WidthMeters?.ToString("N2") ?? "—") / @(building.DepthMeters?.ToString("N2") ?? "—") เมตร</dd></div>
+            <div><dt>ชั้น / ห้อง</dt><dd>@(building.FloorCount?.ToString() ?? "—") / @(building.RoomCount?.ToString() ?? "—")</dd></div>
+            <div><dt>พื้นที่โดยประมาณ</dt><dd>@(building.AreaSquareMeters?.ToString("N2") ?? "—") ตร.ม.</dd></div>
+            <div><dt>ปีที่สร้างหรือซื้อ</dt><dd>@(building.BuiltOrPurchasedYear.HasValue ? $"พ.ศ. {building.BuiltOrPurchasedYear + 543}" : "—")</dd></div>
+            <div><dt>วันที่เริ่มใช้งาน</dt><dd>@(building.StartedOn?.ToString("d MMM yyyy", thai) ?? "—")</dd></div>
+            <div><dt>งบก่อสร้าง</dt><dd>@(building.ConstructionBudget?.ToString("N2") ?? "—") บาท</dd></div>
+        </dl>
+        @if (!string.IsNullOrWhiteSpace(building.Notes)) { <p class="detail-note">@building.Notes</p> }
+    </section>
+    <section id="building-finance" class="content-card detail-section">
+        <h2>รายรับ–รายจ่ายของตึก</h2><p class="muted">ยอดสะสมทุกช่วงเวลา เฉพาะรายการที่ผูกกับตึกนี้ ไม่รวมรายการส่วนกลาง</p>
+        <div class="detail-totals">
+            <div><small>รายรับรวม</small><strong class="text-success">@Model.TotalIncome.ToString("N2") บาท</strong></div>
+            <div><small>รายจ่ายรวม</small><strong class="text-danger">@Model.TotalExpense.ToString("N2") บาท</strong></div>
+            <div><small>รับหักจ่าย</small><strong>@Model.Net.ToString("N2") บาท</strong></div>
+        </div>
+        <p class="muted mt-2">งบก่อสร้างไม่ถูกนำมาหักซ้ำ ยอดนี้คำนวณจากรายการการเงินที่บันทึกเท่านั้น</p>
+        <h3 class="h5 mt-4">รายการล่าสุด 10 รายการ</h3>
+        @if (Model.Transactions.Count == 0) { <p class="muted">ยังไม่มีรายการการเงินของตึกนี้</p> }
+        <div class="detail-list">
+        @foreach (var transaction in Model.Transactions) {
+            <a class="detail-row" asp-controller="Finance" asp-action="Edit" asp-route-id="@transaction.Id">
+                <div><strong>@transaction.Description</strong><small>@transaction.TransactionDate.ToString("d MMM yyyy", thai) · @(transaction.Type == TransactionType.Income ? "รายรับ" : "รายจ่าย")</small></div>
+                <b class="@(transaction.Type == TransactionType.Income ? "text-success" : "text-danger")">@transaction.Amount.ToString("N2") บาท</b>
+            </a>
+        }
+        </div>
+        <a class="btn btn-soft mt-3" asp-controller="Finance" asp-action="Index" asp-route-buildingId="@building.Id">ดูรายการรายเดือนของตึกนี้</a>
+    </section>
+    <section id="building-harvest" class="content-card detail-section">
+        <div class="section-toolbar"><div><h2>ประวัติเก็บรังนก</h2><p>ทั้งหมด @Model.HarvestCount ครั้ง · รวม @Model.TotalHarvestKg.ToString("N3") กก.</p></div>
+        @if (building.Status == BuildingStatus.Active) { <a class="btn btn-soft" asp-controller="Harvest" asp-action="Create" asp-route-buildingId="@building.Id">+ บันทึกการเก็บ</a> }</div>
+        <p class="muted">แสดง 20 ครั้งล่าสุด · น้ำหนักที่เก็บได้ ไม่ใช่สต็อกคงเหลือ</p>
+        @if (Model.Harvests.Count == 0) { <p class="muted">ยังไม่มีประวัติการเก็บรังนก</p> }
+        <div class="detail-list">
+        @foreach (var round in Model.Harvests) {
+            <details class="detail-history"><summary>@round.HarvestedOn.ToString("d MMM yyyy", thai) · @round.TotalWeightKg.ToString("N3") กก.</summary>
+                <div class="harvest-details">
+                @foreach (var item in round.Items) { <div><strong>@Name(item.NestTypeId)</strong><span>@Name(item.ColorId) · @Name(item.ConditionId)</span><b>@item.WeightKg.ToString("N3") กก.</b></div> }
+                </div>
+                @if (!string.IsNullOrWhiteSpace(round.EnvironmentNotes)) { <p class="detail-note mt-2">@round.EnvironmentNotes</p> }
+            </details>
+        }
+        </div>
+    </section>
+    <section id="building-appointments" class="content-card detail-section">
+        <h2>นัดหมายที่ยังไม่เสร็จ</h2><p class="muted">เฉพาะตึกนี้ เรียงจากวันเก่าไปใหม่ สูงสุด 20 รายการ รวมรายการเลยกำหนด</p>
+        @if (Model.Appointments.Count == 0) { <p class="muted">ไม่มีนัดหมายที่รอดำเนินการ</p> }
+        <div class="detail-list">
+        @foreach (var appointment in Model.Appointments) {
+            <a class="detail-row" asp-controller="Calendar" asp-action="Edit" asp-route-id="@appointment.Id">
+                <div><strong>@appointment.Title</strong><small>@appointment.ScheduledDate.ToString("d MMM yyyy", thai) @(appointment.ScheduledTime?.ToString("HH:mm") ?? "") · @(appointment.Type == AppointmentType.Maintenance ? "ซ่อมบำรุง" : appointment.Type == AppointmentType.Harvest ? "เก็บรังนก" : "ขายรังนก")</small>
+                @if (!string.IsNullOrWhiteSpace(appointment.Location)) { <small>@appointment.Location</small> }
+                @if (appointment.ScheduledDate < today) { <span class="text-danger">เลยกำหนด</span> }</div><span>เปิด ›</span>
+            </a>
+        }
+        </div>
+        <a class="btn btn-soft mt-3" asp-controller="Calendar" asp-action="Index">เปิดปฏิทินรวม</a>
+    </section>
+</section>

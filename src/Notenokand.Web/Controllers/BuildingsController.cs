@@ -16,6 +16,38 @@ namespace Notenokand.Web.Controllers;
 [Route("app/buildings")]
 public sealed class BuildingsController(NotenokandDbContext db, UserManager<ApplicationUser> userManager, BuildingPhotoStorage photoStorage) : Controller
 {
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> Details(Guid id)
+    {
+        var accountId = await GetAccountIdAsync();
+        if (accountId is null) return RedirectToAction("Index", "Onboarding");
+        var building = await db.BirdBuildings.AsNoTracking()
+            .SingleOrDefaultAsync(x => x.Id == id && x.AccountId == accountId && !x.IsDeleted);
+        if (building is null) return NotFound();
+        var district = await db.ThaiDistricts.Where(x => x.Code == building.DistrictCode).Select(x => x.NameTh).FirstOrDefaultAsync();
+        var subdistrict = await db.ThaiSubdistricts.Where(x => x.Code == building.SubdistrictCode).Select(x => x.NameTh).FirstOrDefaultAsync();
+        var finance = db.FinancialTransactions.AsNoTracking()
+            .Where(x => x.AccountId == accountId && x.BuildingId == id && !x.IsDeleted);
+        var harvests = db.HarvestRounds.AsNoTracking()
+            .Where(x => x.BuildingId == id && x.Building.AccountId == accountId && !x.IsDeleted);
+        return View(new BuildingDetailsViewModel
+        {
+            Building = building,
+            Location = string.Join(" · ", new[] { building.Address, subdistrict, district, building.Province, building.PostalCode }.Where(x => !string.IsNullOrWhiteSpace(x))),
+            TotalIncome = await finance.Where(x => x.Type == TransactionType.Income).SumAsync(x => (decimal?)x.Amount) ?? 0m,
+            TotalExpense = await finance.Where(x => x.Type == TransactionType.Expense).SumAsync(x => (decimal?)x.Amount) ?? 0m,
+            Transactions = await finance.OrderByDescending(x => x.TransactionDate).ThenByDescending(x => x.CreatedAt).Take(10).ToListAsync(),
+            HarvestCount = await harvests.CountAsync(),
+            TotalHarvestKg = await harvests.SumAsync(x => (decimal?)x.TotalWeightKg) ?? 0m,
+            Harvests = await harvests.Include(x => x.Items.Where(i => !i.IsDeleted))
+                .OrderByDescending(x => x.HarvestedOn).ThenByDescending(x => x.CreatedAt).Take(20).ToListAsync(),
+            OptionNames = await db.MasterOptions.AsNoTracking().ToDictionaryAsync(x => x.Id, x => x.Name),
+            Appointments = await db.CalendarAppointments.AsNoTracking()
+                .Where(x => x.AccountId == accountId && x.BuildingId == id && !x.IsDeleted && x.Status == AppointmentStatus.Scheduled)
+                .OrderBy(x => x.ScheduledDate).ThenBy(x => x.ScheduledTime).Take(20).ToListAsync()
+        });
+    }
+
     [HttpGet("create")]
     public async Task<IActionResult> Create()
     {
