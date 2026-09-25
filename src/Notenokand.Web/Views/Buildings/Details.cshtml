@@ -39,10 +39,21 @@
     </section>
     <section id="building-finance" class="content-card detail-section">
         <h2>รายรับ–รายจ่ายของตึก</h2><p class="muted">ยอดสะสมทุกช่วงเวลา เฉพาะรายการที่ผูกกับตึกนี้ ไม่รวมรายการส่วนกลาง</p>
+        @if (TempData["InvestmentError"] is string investmentError) { <div class="alert alert-warning">@investmentError</div> }
+        <form asp-action="UpdateInvestment" asp-route-id="@building.Id" method="post" class="row g-2 align-items-end mb-3">
+            <div class="col-sm-8"><label for="initialInvestmentAmount" class="form-label">เงินลงทุนเริ่มต้นที่จ่ายจริง</label><div class="input-group"><span class="input-group-text">฿</span><input id="initialInvestmentAmount" name="initialInvestmentAmount" class="form-control" type="number" min="0" max="9999999999999999" step="0.01" value="@building.InitialInvestmentAmount" /></div><small class="text-secondary">แยกจากงบประมาณก่อสร้าง เพื่อคำนวณคืนทุนจากยอดจริง</small></div>
+            <div class="col-sm-4"><button class="btn btn-soft w-100" type="submit">บันทึกเงินลงทุน</button></div>
+        </form>
         <div class="detail-totals">
             <div><small>รายรับรวม</small><strong class="text-success">@Model.TotalIncome.ToString("N2") บาท</strong></div>
             <div><small>รายจ่ายรวม</small><strong class="text-danger">@Model.TotalExpense.ToString("N2") บาท</strong></div>
             <div><small>รับหักจ่าย</small><strong>@Model.Net.ToString("N2") บาท</strong></div>
+        </div>
+        <h3 class="h5 mt-4">ผลตอบแทนสะสม</h3>
+        <div class="detail-totals">
+            <div><small>ฐานเงินลงทุน</small><strong>@Model.InvestmentBase.ToString("N2") บาท</strong><span class="muted">เงินลงทุนจริง + รายจ่ายลงทุน</span></div>
+            <div><small>กำไรจากการดำเนินงาน</small><strong class="@(Model.OperatingProfit >= 0 ? "text-success" : "text-danger")">@Model.OperatingProfit.ToString("N2") บาท</strong><span class="muted">รายรับ − รายจ่ายดำเนินงาน</span></div>
+            <div><small>ผลตอบแทนต่อเงินลงทุน</small><strong>@(Model.InvestmentBase > 0 ? Model.ReturnPercent.ToString("N2") + "%" : "—")</strong><span class="muted">เหลือคืนทุน @Model.RemainingToPayback.ToString("N2") บาท</span></div>
         </div>
         <p class="muted mt-2">งบก่อสร้างไม่ถูกนำมาหักซ้ำ ยอดนี้คำนวณจากรายการการเงินที่บันทึกเท่านั้น</p>
         <h3 class="h5 mt-4">รายการล่าสุด 10 รายการ</h3>

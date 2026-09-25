@@ -6,7 +6,7 @@ using Notenokand.Infrastructure.Identity;
 
 namespace Notenokand.Infrastructure.Persistence;
 
-public sealed class NotenokandDbContext(DbContextOptions<NotenokandDbContext> options)
+public sealed class NotenokandDbContext(DbContextOptions<NotenokandDbContext> options, Microsoft.AspNetCore.Http.IHttpContextAccessor? http = null)
     : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
 {
     public DbSet<BirdBuilding> BirdBuildings => Set<BirdBuilding>();
@@ -33,6 +33,31 @@ public sealed class NotenokandDbContext(DbContextOptions<NotenokandDbContext> op
     public DbSet<QualityScore> QualityScores => Set<QualityScore>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<Account> Accounts => Set<Account>();
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var claim = http?.HttpContext?.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (Guid.TryParse(claim, out var userId))
+        {
+            ChangeTracker.DetectChanges();
+            var entries = ChangeTracker.Entries().Where(x => x.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
+                .Where(x => AuditSnapshot.Supported(x.Metadata.ClrType.Name)).ToArray();
+            if (entries.Length > 0)
+            {
+                var accountId = await AccountUsers.AsNoTracking().Where(x => x.UserId == userId && x.IsActive && !x.IsDeleted)
+                    .Select(x => (Guid?)x.AccountId).FirstOrDefaultAsync(cancellationToken);
+                if (accountId.HasValue)
+                    foreach (var entry in entries)
+                        AuditLogs.Add(new AuditLog
+                        {
+                            AccountId = accountId, UserId = userId, EntityName = entry.Metadata.ClrType.Name,
+                            EntityId = entry.Property("Id").CurrentValue?.ToString() ?? "",
+                            Action = entry.State.ToString(), ChangesJson = AuditSnapshot.Changes(entry),
+                            OccurredAt = DateTimeOffset.UtcNow
+                        });
+            }
+        }
+        return await base.SaveChangesAsync(cancellationToken);
+    }
     public DbSet<AccountUser> AccountUsers => Set<AccountUser>();
     public DbSet<AccountInvitation> AccountInvitations => Set<AccountInvitation>();
     public DbSet<UserConsent> UserConsents => Set<UserConsent>();
@@ -59,6 +84,7 @@ public sealed class NotenokandDbContext(DbContextOptions<NotenokandDbContext> op
         });
 
         builder.ApplyConfigurationsFromAssembly(typeof(NotenokandDbContext).Assembly);
+        builder.Entity<HarvestRound>().Property(x => x.RowVersion).IsRowVersion();
 
         foreach (var entityType in builder.Model.GetEntityTypes()
                      .Where(x => typeof(Notenokand.Domain.Common.Entity).IsAssignableFrom(x.ClrType)))

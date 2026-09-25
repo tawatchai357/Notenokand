@@ -16,6 +16,11 @@
                     }
                 </div>
                 <span asp-validation-for="Type"></span>
+                <div class="form-check mt-3">
+                    <input asp-for="IsCapitalExpense" class="form-check-input" />
+                    <label asp-for="IsCapitalExpense" class="form-check-label"></label>
+                    <small class="d-block text-secondary">เลือกเมื่อเป็นค่าก่อสร้าง ซื้ออุปกรณ์ หรือปรับปรุงสินทรัพย์ ไม่ใช่ค่าใช้จ่ายดำเนินงานประจำ</small>
+                </div>
                 <div class="row g-3 mt-1">
                     <div class="col-12 form-field">
                         <label asp-for="CategoryId"></label>

@@ -60,6 +60,9 @@ public sealed class FinanceEditViewModel
     [Display(Name = "จำนวนเงิน (บาท)")]
     public decimal Amount { get; set; }
 
+    [Display(Name = "เป็นรายจ่ายลงทุน/ปรับปรุงสินทรัพย์")]
+    public bool IsCapitalExpense { get; set; }
+
     [Display(Name = "ตึกนก")]
     public Guid? BuildingId { get; set; }
 

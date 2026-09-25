@@ -1,0 +1,8 @@
+@model IReadOnlyList<Notenokand.Domain.Entities.AuditLog>
+@{ ViewData["Title"] = "ประวัติการแก้ไข"; var page = (int)(ViewData["Page"] ?? 1); }
+<h1 class="mt-4">ประวัติการแก้ไข</h1><p>เฉพาะเจ้าของกิจการ · เริ่มเก็บตั้งแต่เปิดใช้งานฟังก์ชันนี้ ไม่สามารถสร้างประวัติย้อนหลังที่ไม่เคยบันทึกได้</p>
+@if (Model.Count == 0) { <p>ยังไม่มีประวัติในหน้านี้</p> }
+@foreach(var row in Model) {
+<article class="content-card mb-3"><strong>@row.EntityName · @row.Action</strong><p>@row.OccurredAt.ToOffset(TimeSpan.FromHours(7)).ToString("d MMM yyyy HH:mm", new System.Globalization.CultureInfo("th-TH"))</p><small>ผู้ใช้ @row.UserId · รายการ @row.EntityId</small><details><summary>ค่าเดิม / ค่าใหม่</summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere">@row.ChangesJson</pre></details></article>
+}
+<div class="d-flex gap-2">@if(page > 1){<a class="btn btn-soft" asp-route-page="@(page - 1)">ก่อนหน้า</a>}<span>หน้า @(page)</span>@if((bool)(ViewData["HasNext"] ?? false)){<a class="btn btn-soft" asp-route-page="@(page + 1)">ถัดไป</a>}</div>

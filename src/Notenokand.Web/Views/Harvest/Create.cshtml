@@ -4,7 +4,9 @@
 <section class="finance-page">
     <div class="page-breadcrumb"><a asp-action="Index">การเก็บรังนก</a><span>/ บันทึกการเก็บ</span></div>
     <div class="editor-heading"><div><h1>บันทึกการเก็บรังนก</h1><p>หนึ่งครั้งเพิ่มรังได้หลายประเภท แยกน้ำหนักแต่ละรายการ</p></div></div>
-    <form asp-action="Create" method="post" data-harvest-form>
+    <form asp-controller="@(Model.Id.HasValue ? "HarvestManagement" : "Harvest")" asp-action="@(Model.Id.HasValue ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post" data-harvest-form>
+        <input asp-for="Version" type="hidden" />
+        @if (Model.Id.HasValue) { <div class="alert alert-info">กำลังแก้ไขรอบเก็บเดิม ระบบจะปรับสต็อกตามน้ำหนักใหม่</div> }
         <div asp-validation-summary="All" class="text-danger" role="alert"></div>
         <section class="form-card mb-3"><div class="row g-3">
             <div class="col-md-6"><label asp-for="BuildingId">ตึกนก</label><select asp-for="BuildingId" asp-items="Model.Buildings" class="form-select" required><option value="">เลือกตึกนก</option></select><span asp-validation-for="BuildingId"></span></div>

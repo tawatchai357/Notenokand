@@ -17,7 +17,8 @@ public sealed class AccountController(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
     NotenokandDbContext db,
-    IWebHostEnvironment environment) : Controller
+    IWebHostEnvironment environment,
+    Notenokand.Web.Services.AccountEmailService accountEmail) : Controller
 {
     [HttpGet("register")]
     public IActionResult Register() => User.Identity?.IsAuthenticated == true
@@ -73,6 +74,7 @@ public sealed class AccountController(
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
         var confirmationUrl = Url.Action(nameof(ConfirmEmail), "Account", new { userId = user.Id, code }, Request.Scheme)!;
+        await SendConfirmationAsync(user, code);
         if (environment.IsDevelopment())
             TempData["DevelopmentConfirmationUrl"] = confirmationUrl;
 
@@ -98,6 +100,7 @@ public sealed class AccountController(
             var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
             var code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
             var confirmationUrl = Url.Action(nameof(ConfirmEmail), "Account", new { userId = user.Id, code }, Request.Scheme)!;
+            await SendConfirmationAsync(user, code);
             db.EmailVerificationLogs.Add(new EmailVerificationLog
             {
                 UserId = user.Id,
@@ -183,6 +186,14 @@ public sealed class AccountController(
 
     [HttpGet("access-denied")]
     public IActionResult AccessDenied() => View();
+
+    private async Task SendConfirmationAsync(ApplicationUser user, string code)
+    {
+        var sent = accountEmail.IsConfigured && await accountEmail.SendLinkAsync(user.Email!,
+            "ยืนยันอีเมล Notenokand", accountEmail.Link("account/confirm-email") +
+            "?userId=" + user.Id + "&code=" + Uri.EscapeDataString(code));
+        if (!sent) TempData["EmailDeliveryWarning"] = "ยังส่งอีเมลไม่สำเร็จ ผู้ดูแลต้องตั้งค่าหรือตรวจบริการอีเมล";
+    }
 
     private static string TranslateIdentityError(string code) => code switch
     {

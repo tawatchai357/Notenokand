@@ -11,8 +11,12 @@ builder.Logging.AddDebug();
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
 // Add services to the container.
+builder.Services.AddScoped<Notenokand.Web.Services.AccountPermissionFilter>();
 builder.Services.AddControllersWithViews(options =>
-    options.ModelBinderProviders.Insert(0, new IsoTemporalModelBinderProvider()));
+{
+    options.ModelBinderProviders.Insert(0, new IsoTemporalModelBinderProvider());
+    options.Filters.AddService<Notenokand.Web.Services.AccountPermissionFilter>();
+});
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -33,6 +37,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddSingleton<Notenokand.Web.Services.BuildingPhotoStorage>();
 builder.Services.AddScoped<Notenokand.Web.Services.AppointmentNotificationService>();
 builder.Services.AddScoped<Notenokand.Web.Services.LotSaleService>();
+builder.Services.AddScoped<Notenokand.Web.Services.AccountEmailService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -50,6 +56,17 @@ app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Referrer-Policy"] = "no-referrer";
+    context.Response.OnStarting(() =>
+    {
+        if (context.GetEndpoint()?.Metadata.GetMetadata<Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor>() is not null)
+            context.Response.Headers.CacheControl = "no-store";
+        return Task.CompletedTask;
+    });
+    await next();
+});
 
 app.MapStaticAssets();
 

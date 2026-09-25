@@ -36,6 +36,8 @@ public sealed class BuildingsController(NotenokandDbContext db, UserManager<Appl
             Location = string.Join(" · ", new[] { building.Address, subdistrict, district, building.Province, building.PostalCode }.Where(x => !string.IsNullOrWhiteSpace(x))),
             TotalIncome = await finance.Where(x => x.Type == TransactionType.Income).SumAsync(x => (decimal?)x.Amount) ?? 0m,
             TotalExpense = await finance.Where(x => x.Type == TransactionType.Expense).SumAsync(x => (decimal?)x.Amount) ?? 0m,
+            OperatingExpense = await finance.Where(x => x.Type == TransactionType.Expense && !x.IsCapitalExpense).SumAsync(x => (decimal?)x.Amount) ?? 0m,
+            CapitalExpense = await finance.Where(x => x.Type == TransactionType.Expense && x.IsCapitalExpense).SumAsync(x => (decimal?)x.Amount) ?? 0m,
             Transactions = await finance.OrderByDescending(x => x.TransactionDate).ThenByDescending(x => x.CreatedAt).Take(10).ToListAsync(),
             HarvestCount = await harvests.CountAsync(),
             TotalHarvestKg = await harvests.SumAsync(x => (decimal?)x.TotalWeightKg) ?? 0m,
@@ -54,6 +56,26 @@ public sealed class BuildingsController(NotenokandDbContext db, UserManager<Appl
         var accountId = await GetAccountIdAsync();
         if (accountId is null) return RedirectToAction("Index", "Onboarding");
         return View("Edit", new BuildingEditViewModel { Code = await NextCodeAsync(accountId.Value), Provinces = await LoadProvincesAsync() });
+    }
+
+    [HttpPost("{id:guid}/investment")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateInvestment(Guid id, decimal? initialInvestmentAmount)
+    {
+        var accountId = await GetAccountIdAsync(); var userId = GetUserId();
+        if (accountId is null || userId is null) return Forbid();
+        if (initialInvestmentAmount is < 0 or > 9999999999999999m)
+        {
+            TempData["InvestmentError"] = "เงินลงทุนจริงต้องไม่ติดลบและไม่เกินขอบเขตที่กำหนด";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        var building = await db.BirdBuildings.SingleOrDefaultAsync(x => x.Id == id && x.AccountId == accountId && !x.IsDeleted);
+        if (building is null) return NotFound();
+        building.InitialInvestmentAmount = initialInvestmentAmount;
+        building.UpdatedAt = DateTimeOffset.UtcNow; building.UpdatedByUserId = userId;
+        await db.SaveChangesAsync();
+        TempData["SuccessMessage"] = "บันทึกเงินลงทุนจริงแล้ว";
+        return RedirectToAction(nameof(Details), new { id });
     }
 
     [HttpPost("create")]

@@ -9,6 +9,12 @@ public sealed class BuildingDetailsViewModel
     public decimal TotalIncome { get; init; }
     public decimal TotalExpense { get; init; }
     public decimal Net => TotalIncome - TotalExpense;
+    public decimal OperatingExpense { get; init; }
+    public decimal CapitalExpense { get; init; }
+    public decimal InvestmentBase => (Building.InitialInvestmentAmount ?? 0m) + CapitalExpense;
+    public decimal OperatingProfit => TotalIncome - OperatingExpense;
+    public decimal ReturnPercent => InvestmentBase > 0 ? OperatingProfit / InvestmentBase * 100m : 0m;
+    public decimal RemainingToPayback => Math.Max(0m, InvestmentBase - OperatingProfit);
     public decimal TotalHarvestKg { get; init; }
     public int HarvestCount { get; init; }
     public IReadOnlyList<FinancialTransaction> Transactions { get; init; } = [];

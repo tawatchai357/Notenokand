@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Notenokand.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Notenokand.Infrastructure.Persistence;
 namespace Notenokand.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(NotenokandDbContext))]
-    partial class NotenokandDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260925043523_AddAuditScopeAndHarvestConcurrency")]
+    partial class AddAuditScopeAndHarvestConcurrency
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -475,9 +478,6 @@ namespace Notenokand.Infrastructure.Persistence.Migrations
                     b.Property<int?>("FloorCount")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("InitialInvestmentAmount")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -902,9 +902,6 @@ namespace Notenokand.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid?>("HarvestRoundId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsCapitalExpense")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");

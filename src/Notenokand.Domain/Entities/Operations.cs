@@ -25,6 +25,7 @@ public sealed class BirdBuilding : Entity
     public decimal? WidthMeters { get; set; }
     public decimal? DepthMeters { get; set; }
     public decimal? ConstructionBudget { get; set; }
+    public decimal? InitialInvestmentAmount { get; set; }
     public string? PhotoStorageKey { get; set; }
     public string? PhotoOriginalFileName { get; set; }
     public string? PhotoContentType { get; set; }
@@ -58,6 +59,7 @@ public sealed class DailyLog : Entity
 
 public sealed class HarvestRound : Entity
 {
+    public byte[] RowVersion { get; set; } = [];
     public Guid BuildingId { get; set; }
     public required string RoundNumber { get; set; }
     public string? HarvestArea { get; set; }

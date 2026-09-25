@@ -178,6 +178,7 @@ public sealed class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
         b.Property(x => x.EntityId).HasMaxLength(100);
         b.Property(x => x.OccurredAt).HasPrecision(0);
         b.HasIndex(x => x.OccurredAt);
+        b.HasIndex(x => new { x.AccountId, x.OccurredAt });
     }
 }
 

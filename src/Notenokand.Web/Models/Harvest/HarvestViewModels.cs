@@ -4,6 +4,8 @@ using Notenokand.Domain.Entities;
 namespace Notenokand.Web.Models.Harvest;
 public sealed class HarvestEditViewModel : IValidatableObject
 {
+    public Guid? Id { get; set; }
+    public string? Version { get; set; }
     [Required(ErrorMessage = "กรุณาเลือกตึกนก")]
     public Guid? BuildingId { get; set; }
     [Required(ErrorMessage = "กรุณาเลือกวันที่เก็บรัง")]

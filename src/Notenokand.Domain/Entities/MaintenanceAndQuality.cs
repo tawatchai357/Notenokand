@@ -77,6 +77,7 @@ public sealed class QualityScore : Entity
 
 public sealed class AuditLog
 {
+    public Guid? AccountId { get; set; }
     public long Id { get; set; }
     public Guid? UserId { get; set; }
     public required string Action { get; set; }

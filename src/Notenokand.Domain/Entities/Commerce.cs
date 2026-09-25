@@ -72,6 +72,7 @@ public sealed class FinancialTransaction : Entity
     public DateOnly? PaidOn { get; set; }
     public required string Description { get; set; }
     public decimal Amount { get; set; }
+    public bool IsCapitalExpense { get; set; }
     public string? ReferenceNumber { get; set; }
     public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.BankTransfer;
     public string? Counterparty { get; set; }

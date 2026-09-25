@@ -90,6 +90,7 @@ public sealed class FinanceController(NotenokandDbContext db, UserManager<Applic
             AccountId = context.Value.AccountId, OwnerUserId = context.Value.UserId, BuildingId = model.BuildingId,
             ExpenseCategoryId = model.CategoryId, Type = model.Type, TransactionDate = model.TransactionDate, PaidOn = model.TransactionDate,
             Description = model.Description.Trim(), Amount = model.Amount, PaymentMethod = model.PaymentMethod,
+            IsCapitalExpense = model.Type == TransactionType.Expense && model.IsCapitalExpense,
             Counterparty = Clean(model.Counterparty), SaleLocation = isBirdNestSale ? Clean(model.SaleLocation) : null,
             AveragePricePerKg = isBirdNestSale ? model.AveragePricePerKg : null, ReferenceNumber = Clean(model.ReferenceNumber), Notes = Clean(model.Notes), CreatedByUserId = context.Value.UserId
         };
@@ -119,7 +120,7 @@ public sealed class FinanceController(NotenokandDbContext db, UserManager<Applic
         var model = new FinanceEditViewModel
         {
             Id = entity.Id, Type = entity.Type, TransactionDate = entity.TransactionDate, Description = entity.Description,
-            Amount = entity.Amount, BuildingId = entity.BuildingId, CategoryId = entity.ExpenseCategoryId,
+            Amount = entity.Amount, IsCapitalExpense = entity.IsCapitalExpense, BuildingId = entity.BuildingId, CategoryId = entity.ExpenseCategoryId,
             PaymentMethod = entity.PaymentMethod, Counterparty = entity.Counterparty, SaleLocation = entity.SaleLocation, AveragePricePerKg = entity.AveragePricePerKg, ReferenceNumber = entity.ReferenceNumber, Notes = entity.Notes,
             ExistingReceipts = await db.TransactionReceipts.AsNoTracking().Where(x => x.AccountId == context.Value.AccountId && x.FinancialTransactionId == id && !x.IsDeleted).Select(x => new ReceiptViewModel { Id = x.Id, FileName = x.OriginalFileName, SizeBytes = x.SizeBytes }).ToListAsync()
         };
@@ -140,6 +141,7 @@ public sealed class FinanceController(NotenokandDbContext db, UserManager<Applic
         if (!ModelState.IsValid) { await LoadEditorOptionsAsync(model, context.Value.AccountId, entity.BuildingId); model.ExistingReceipts = await LoadReceiptsAsync(context.Value.AccountId, id); return View(model); }
         entity.Type = model.Type; entity.TransactionDate = model.TransactionDate; entity.PaidOn = model.TransactionDate;
         entity.Description = model.Description.Trim(); entity.Amount = model.Amount; entity.BuildingId = model.BuildingId;
+        entity.IsCapitalExpense = model.Type == TransactionType.Expense && model.IsCapitalExpense;
         entity.ExpenseCategoryId = model.CategoryId; entity.PaymentMethod = model.PaymentMethod;
         entity.Counterparty = Clean(model.Counterparty); entity.SaleLocation = isBirdNestSale ? Clean(model.SaleLocation) : null;
         entity.AveragePricePerKg = isBirdNestSale ? model.AveragePricePerKg : null; entity.ReferenceNumber = Clean(model.ReferenceNumber); entity.Notes = Clean(model.Notes);
