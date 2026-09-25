@@ -57,13 +57,14 @@ IF @result < 0 THROW 51000, 'Stock operation busy. Retry.', 1;");
             if (changed != 1) throw new LotSaleException("สต็อกไม่เพียงพอหรือถูกขายไปแล้ว กรุณาตรวจยอดคงเหลืออีกครั้ง");
         }
         var buyer = new Buyer { OwnerUserId = userId, Name = model.BuyerName.Trim(), CreatedByUserId = userId };
+        var initialPaid = model.ReceivedInFull ? model.TotalAmount : model.InitialPaidAmount ?? 0m;
         var sale = new Sale
         {
             Id = model.RequestId, AccountId = accountId, OwnerUserId = userId,
             DocumentNumber = $"SL-{model.SaleDate:yyyyMMdd}-{model.RequestId:N}",
             SaleDate = model.SaleDate, Buyer = buyer, SaleLocation = model.SaleLocation.Trim(), Notes = model.Notes?.Trim(),
-            Subtotal = model.TotalAmount, NetAmount = model.TotalAmount, PaidAmount = model.TotalAmount,
-            PaymentMethod = model.PaymentMethod.ToString(), PaymentStatus = PaymentStatus.Paid,
+            Subtotal = model.TotalAmount, NetAmount = model.TotalAmount, PaidAmount = initialPaid, DueDate = initialPaid < model.TotalAmount ? model.DueDate : null,
+            PaymentMethod = model.PaymentMethod.ToString(), PaymentStatus = initialPaid == 0 ? PaymentStatus.Unpaid : initialPaid < model.TotalAmount ? PaymentStatus.PartiallyPaid : PaymentStatus.Paid,
             Status = SaleStatus.Confirmed, CreatedByUserId = userId,
             Items = model.Items.Select(x => new SaleItem
             {
@@ -72,25 +73,68 @@ IF @result < 0 THROW 51000, 'Stock operation busy. Retry.', 1;");
             }).ToList()
         };
         db.Sales.Add(sale);
-        var categoryId = await db.ExpenseCategories.Where(x => x.AccountId == accountId && !x.IsDeleted &&
-            x.Type == TransactionType.Income && x.Name == "ขายรังนก").Select(x => (Guid?)x.Id).FirstOrDefaultAsync();
-        foreach (var group in model.Items.GroupBy(x => stock[x.HarvestItemId].HarvestRound.BuildingId))
+        if (initialPaid > 0)
         {
-            var amount = group.Sum(x => x.Amount);
-            var weight = group.Sum(x => x.WeightKg);
-            db.FinancialTransactions.Add(new FinancialTransaction
-            {
-                AccountId = accountId, OwnerUserId = userId, BuildingId = group.Key, SaleId = sale.Id,
-                ExpenseCategoryId = categoryId, Type = TransactionType.Income, TransactionDate = model.SaleDate, PaidOn = model.SaleDate,
-                Description = $"ขายรังนกจากล็อต {sale.DocumentNumber}", Amount = amount,
-                PaymentMethod = model.PaymentMethod, Counterparty = buyer.Name, SaleLocation = sale.SaleLocation,
-                AveragePricePerKg = decimal.Round(amount / weight, 2, MidpointRounding.AwayFromZero),
-                ReferenceNumber = sale.DocumentNumber, Notes = sale.Notes, CreatedByUserId = userId
-            });
+            var groups = model.Items.GroupBy(x => stock[x.HarvestItemId].HarvestRound.BuildingId)
+                .Select(x => (BuildingId: x.Key, SaleAmount: x.Sum(i => i.Amount), Weight: x.Sum(i => i.WeightKg))).ToList();
+            await AddPaymentTransactionsAsync(accountId, userId, sale, buyer.Name, model.PaymentMethod, model.SaleDate, initialPaid, groups, sale.DocumentNumber);
         }
         await db.SaveChangesAsync();
         await transaction.CommitAsync();
         return sale.Id;
+    }
+
+    public async Task RecordPaymentAsync(Guid accountId, Guid userId, Guid saleId, SalePaymentViewModel model)
+    {
+        var errors = new List<ValidationResult>();
+        Validator.TryValidateObject(model, new ValidationContext(model), errors, true);
+        if (errors.Count > 0) throw new LotSaleException(errors[0].ErrorMessage!);
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        await LockAccountAsync(accountId);
+        var reference = $"PY-{model.RequestId:N}";
+        if (await db.FinancialTransactions.AnyAsync(x => x.AccountId == accountId && x.SaleId == saleId && x.ReferenceNumber == reference))
+            return;
+        var sale = await db.Sales.Include(x => x.Buyer).Include(x => x.Items).ThenInclude(x => x.HarvestItem).ThenInclude(x => x.HarvestRound)
+            .SingleOrDefaultAsync(x => x.Id == saleId && x.AccountId == accountId && !x.IsDeleted);
+        if (sale is null || sale.Status != SaleStatus.Confirmed) throw new LotSaleException("รายการขายไม่พร้อมรับชำระ");
+        var outstanding = sale.NetAmount - sale.PaidAmount;
+        if (model.Amount > outstanding) throw new LotSaleException("ยอดรับชำระมากกว่ายอดค้าง");
+        if (model.PaidOn < sale.SaleDate) throw new LotSaleException("วันที่รับเงินต้องไม่ก่อนวันที่ขาย");
+        var groups = sale.Items.GroupBy(x => x.HarvestItem.HarvestRound.BuildingId)
+            .Select(x => (BuildingId: x.Key, SaleAmount: x.Sum(i => i.NetAmount), Weight: x.Sum(i => i.WeightKg))).ToList();
+        await AddPaymentTransactionsAsync(accountId, userId, sale, sale.Buyer.Name, model.PaymentMethod, model.PaidOn, model.Amount, groups, reference);
+        sale.PaidAmount += model.Amount;
+        sale.PaymentMethod = model.PaymentMethod.ToString();
+        sale.PaymentStatus = sale.PaidAmount >= sale.NetAmount ? PaymentStatus.Paid : PaymentStatus.PartiallyPaid;
+        if (sale.PaymentStatus == PaymentStatus.Paid) sale.DueDate = null;
+        sale.UpdatedAt=DateTimeOffset.UtcNow; sale.UpdatedByUserId=userId;
+        await db.SaveChangesAsync(); await transaction.CommitAsync();
+    }
+
+    private async Task AddPaymentTransactionsAsync(Guid accountId, Guid userId, Sale sale, string buyerName,
+        PaymentMethod method, DateOnly paidOn, decimal paymentAmount,
+        IReadOnlyList<(Guid BuildingId, decimal SaleAmount, decimal Weight)> groups, string reference)
+    {
+        var categoryId = await db.ExpenseCategories.Where(x => x.AccountId == accountId && !x.IsDeleted &&
+            x.Type == TransactionType.Income && x.Name == "ขายรังนก").Select(x => (Guid?)x.Id).FirstOrDefaultAsync();
+        var remaining = paymentAmount;
+        for (var index = 0; index < groups.Count; index++)
+        {
+            var group = groups[index];
+            var amount = index == groups.Count - 1 ? remaining :
+                decimal.Round(paymentAmount * group.SaleAmount / sale.NetAmount, 2, MidpointRounding.AwayFromZero);
+            remaining -= amount;
+            if (amount <= 0) continue;
+            db.FinancialTransactions.Add(new FinancialTransaction
+            {
+                AccountId=accountId, OwnerUserId=userId, BuildingId=group.BuildingId, SaleId=sale.Id,
+                ExpenseCategoryId=categoryId, Type=TransactionType.Income, TransactionDate=paidOn, PaidOn=paidOn,
+                Description=$"รับชำระค่าขายรังนก {sale.DocumentNumber}", Amount=amount, PaymentMethod=method,
+                Counterparty=buyerName, SaleLocation=sale.SaleLocation,
+                AveragePricePerKg=group.Weight > 0 ? decimal.Round(group.SaleAmount / group.Weight, 2, MidpointRounding.AwayFromZero) : null,
+                ReferenceNumber=reference, Notes=sale.Notes, CreatedByUserId=userId
+            });
+        }
     }
 
     public async Task CancelAsync(Guid accountId, Guid userId, Guid id)

@@ -1,0 +1,19 @@
+@using Notenokand.Domain.Enums
+@model Notenokand.Web.Models.Maintenance.MaintenanceEditViewModel
+@{ var editing=Model.Id.HasValue; ViewData["Title"]=editing ? "แก้ไขงานซ่อมบำรุง" : "เพิ่มงานซ่อมบำรุง"; }
+<section class="finance-page"><div class="editor-heading"><div><span class="eyebrow">งานซ่อมบำรุง</span><h1>@ViewData["Title"]</h1><p>บันทึกปัญหา สถานะ ต้นทุน และรอบตรวจครั้งถัดไป</p></div><a class="btn btn-soft" asp-action="Index">ยกเลิก</a></div>
+<form method="post" asp-action="@(editing ? "Edit" : "Create")" asp-route-id="@Model.Id" class="content-card"><div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+  <div class="row g-3">
+    <div class="col-md-6 form-field"><label asp-for="BuildingId">ตึกนก</label><select asp-for="BuildingId" asp-items="Model.Buildings" class="form-select"><option value="">เลือกตึกนก</option></select><span asp-validation-for="BuildingId"></span></div>
+    <div class="col-md-3 form-field"><label asp-for="Type">ประเภทงาน</label><select asp-for="Type" class="form-select"><option value="@MaintenanceType.Preventive">บำรุงรักษาเชิงป้องกัน</option><option value="@MaintenanceType.Corrective">แก้ไขเหตุขัดข้อง</option></select></div>
+    <div class="col-md-3 form-field"><label asp-for="Priority">ความสำคัญ</label><select asp-for="Priority" class="form-select"><option value="@MaintenancePriority.Low">ต่ำ</option><option value="@MaintenancePriority.Normal">ปกติ</option><option value="@MaintenancePriority.High">สูง</option><option value="@MaintenancePriority.Urgent">เร่งด่วน</option></select></div>
+    <div class="col-12 form-field"><label asp-for="Issue">ปัญหา / งานที่ต้องทำ</label><textarea asp-for="Issue" class="form-control" rows="3" placeholder="เช่น ตรวจลำโพงชั้น 3 เสียงขาดหาย"></textarea><span asp-validation-for="Issue"></span></div>
+    <div class="col-md-6 form-field"><label asp-for="Status">สถานะ</label><select asp-for="Status" class="form-select"><option value="@MaintenanceStatus.Reported">แจ้งงาน</option><option value="@MaintenanceStatus.InProgress">กำลังดำเนินการ</option><option value="@MaintenanceStatus.AwaitingAcceptance">รอตรวจรับ</option><option value="@MaintenanceStatus.Completed">เสร็จแล้ว</option><option value="@MaintenanceStatus.Cancelled">ยกเลิก</option></select></div>
+    <div class="col-md-6 form-field"><label>วันตรวจครั้งถัดไป</label><input asp-for="NextInspectionOn" type="hidden" data-thai-date-value /><input type="text" class="form-control" data-thai-datepicker data-target="NextInspectionOn" readonly /><span asp-validation-for="NextInspectionOn"></span></div>
+    <div class="col-md-4 form-field"><label asp-for="PartsCost">ค่าอะไหล่ (บาท)</label><input asp-for="PartsCost" class="form-control" inputmode="decimal" /></div>
+    <div class="col-md-4 form-field"><label asp-for="LaborCost">ค่าแรง (บาท)</label><input asp-for="LaborCost" class="form-control" inputmode="decimal" /></div>
+    <div class="col-md-4 form-field"><label asp-for="DowntimeHours">เวลาหยุดทำงาน (ชั่วโมง)</label><input asp-for="DowntimeHours" class="form-control" inputmode="decimal" /></div>
+    <div class="col-12 form-field"><label asp-for="AcceptanceResult">ผลตรวจรับ / หมายเหตุปิดงาน</label><textarea asp-for="AcceptanceResult" class="form-control" rows="3"></textarea><span asp-validation-for="AcceptanceResult"></span></div>
+  </div><div class="form-actions mt-4"><a class="btn btn-soft" asp-action="Index">ยกเลิก</a><button class="btn btn-primary" type="submit">บันทึกงาน →</button></div>
+</form></section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

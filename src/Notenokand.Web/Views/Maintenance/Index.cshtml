@@ -1,0 +1,23 @@
+@using Notenokand.Domain.Enums
+@model Notenokand.Web.Models.Maintenance.MaintenanceIndexViewModel
+@functions {
+    string StatusName(MaintenanceStatus value) => value switch { MaintenanceStatus.Reported => "แจ้งงาน", MaintenanceStatus.InProgress => "กำลังทำ", MaintenanceStatus.AwaitingAcceptance => "รอตรวจรับ", MaintenanceStatus.Completed => "เสร็จแล้ว", _ => "ยกเลิก" };
+    string PriorityName(MaintenancePriority value) => value switch { MaintenancePriority.Urgent => "เร่งด่วน", MaintenancePriority.High => "สูง", MaintenancePriority.Normal => "ปกติ", _ => "ต่ำ" };
+}
+@{ ViewData["Title"]="งานซ่อมบำรุง"; }
+<section class="finance-page">
+  <div class="editor-heading"><div><span class="eyebrow">ดูแลงานและต้นทุน</span><h1>งานซ่อมบำรุง</h1><p>ติดตามตั้งแต่แจ้งปัญหาจนถึงตรวจรับงาน</p></div><a class="btn btn-primary" asp-action="Create">+ เพิ่มงาน</a></div>
+  <div class="building-metrics mb-3"><div><small>งานค้าง</small><strong>@Model.OpenCount งาน</strong></div><div><small>ต้นทุนงานที่เสร็จ</small><strong>฿@Model.TotalCost.ToString("N2")</strong></div></div>
+  <div class="filter-pills mb-3"><a class="@(Model.Status is null ? "active" : "")" asp-action="Index">ทั้งหมด</a>@foreach(var s in Enum.GetValues<MaintenanceStatus>()){<a class="@(Model.Status == s ? "active" : "")" asp-action="Index" asp-route-status="@s">@StatusName(s)</a>}</div>
+  @if(Model.Jobs.Count == 0){<div class="content-card empty-state"><h2>ไม่พบงานซ่อมบำรุง</h2><p>เพิ่มงานจากปัญหาที่พบ หรืองานตรวจเชิงป้องกันตามรอบ</p><a class="btn btn-soft" asp-action="Create">สร้างงานแรก</a></div>}
+  <div class="harvest-history">
+  @foreach(var item in Model.Jobs){
+    <article class="content-card">
+      <div class="section-toolbar"><div><span class="eyebrow">@Model.BuildingNames.GetValueOrDefault(item.BuildingId, "ไม่พบตึก") · @PriorityName(item.Priority)</span><h2>@item.Issue</h2></div><span class="status-pill @(item.Status == MaintenanceStatus.Completed ? "active" : "")">@StatusName(item.Status)</span></div>
+      <div class="finance-meta"><span>แจ้ง @item.ReportedAt.ToOffset(TimeSpan.FromHours(7)).ToString("d MMM yyyy HH:mm", new System.Globalization.CultureInfo("th-TH"))</span><span>@(item.Type == MaintenanceType.Preventive ? "เชิงป้องกัน" : "แก้ไขเหตุขัดข้อง")</span><span>ค่าใช้จ่าย ฿@((item.PartsCost + item.LaborCost).ToString("N2"))</span>@if(item.NextInspectionOn.HasValue){<span>ตรวจครั้งถัดไป @item.NextInspectionOn.Value.ToString("d MMM yyyy", new System.Globalization.CultureInfo("th-TH"))</span>}</div>
+      @if(!string.IsNullOrWhiteSpace(item.AcceptanceResult)){<p class="mt-3 mb-0">ผลตรวจรับ: @item.AcceptanceResult</p>}
+      <div class="mt-3"><a class="btn btn-soft" asp-action="Edit" asp-route-id="@item.Id">แก้ไข / อัปเดตสถานะ</a></div>
+    </article>
+  }
+  </div>
+</section>

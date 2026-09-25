@@ -5,6 +5,8 @@ using Notenokand.Infrastructure.Persistence;
 using Notenokand.Web.Models.Calendar;
 using Notenokand.Web.Models.Finance;
 using Notenokand.Web.Models.Harvest;
+using Notenokand.Web.Models.Maintenance;
+using Notenokand.Web.Models.Quality;
 using Notenokand.Web.Models.Stock;
 
 namespace Notenokand.Web.Services;
@@ -42,6 +44,12 @@ public sealed class AccountPermissionFilter(NotenokandDbContext db) : IAsyncActi
                 case FinanceEditViewModel x when x.BuildingId.HasValue: buildingIds.Add(x.BuildingId.Value); break;
                 case AppointmentEditViewModel x when x.BuildingId.HasValue: buildingIds.Add(x.BuildingId.Value); break;
                 case HarvestEditViewModel x when x.BuildingId.HasValue: buildingIds.Add(x.BuildingId.Value); break;
+                case MaintenanceEditViewModel x when x.BuildingId.HasValue: buildingIds.Add(x.BuildingId.Value); break;
+                case QualityScoreEditViewModel x:
+                    var qualityBuildingId = await db.HarvestRounds.Where(i => i.Id == x.HarvestRoundId && i.Building.AccountId == member.AccountId)
+                        .Select(i => (Guid?)i.BuildingId).FirstOrDefaultAsync();
+                    if (qualityBuildingId.HasValue) buildingIds.Add(qualityBuildingId.Value);
+                    break;
                 case SaleCreateViewModel x:
                     var itemIds = x.Items?.Select(i => i.HarvestItemId).Where(i => i != Guid.Empty).ToArray() ?? [];
                     foreach (var stockBuildingId in await db.HarvestItems.Where(i => itemIds.Contains(i.Id)).Select(i => i.HarvestRound.BuildingId).Distinct().ToListAsync()) buildingIds.Add(stockBuildingId);
@@ -58,6 +66,7 @@ public sealed class AccountPermissionFilter(NotenokandDbContext db) : IAsyncActi
             {
                 "Buildings" => await db.BirdBuildings.Where(x => x.Id == id && x.AccountId == member.AccountId).Select(x => (Guid?)x.Id).FirstOrDefaultAsync(),
                 "HarvestManagement" => await db.HarvestRounds.Where(x => x.Id == id && x.Building.AccountId == member.AccountId).Select(x => (Guid?)x.BuildingId).FirstOrDefaultAsync(),
+                "Maintenance" => await db.MaintenanceJobs.Where(x => x.Id == id && db.BirdBuildings.Any(b => b.Id == x.BuildingId && b.AccountId == member.AccountId)).Select(x => (Guid?)x.BuildingId).FirstOrDefaultAsync(),
                 "Finance" => await db.FinancialTransactions.Where(x => x.Id == id && x.AccountId == member.AccountId).Select(x => x.BuildingId).FirstOrDefaultAsync(),
                 "Calendar" or "Notifications" => await db.CalendarAppointments.Where(x => x.Id == id && x.AccountId == member.AccountId).Select(x => x.BuildingId).FirstOrDefaultAsync(),
                 "Stock" => null,
@@ -66,7 +75,7 @@ public sealed class AccountPermissionFilter(NotenokandDbContext db) : IAsyncActi
             if (found.HasValue) buildingIds.Add(found.Value);
         }
         // Central transactions and unscoped business mutations are Owner-only.
-        if (controller is "Finance" or "Calendar" or "Harvest" or "HarvestManagement" or "Buildings" or "Stock" or "Notifications")
+        if (controller is "Finance" or "Calendar" or "Harvest" or "HarvestManagement" or "Maintenance" or "Quality" or "Buildings" or "Stock" or "Notifications")
         {
             if (buildingIds.Count == 0) { context.Result = new ForbidResult(); return; }
             var allowed = await db.BuildingUsers.AsNoTracking().Where(x => x.UserId == userId && !x.IsDeleted && buildingIds.Contains(x.BuildingId))

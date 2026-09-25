@@ -4,7 +4,7 @@
 @section Head { <link rel="stylesheet" href="~/css/stock.css" asp-append-version="true" /> }
 <section class="stock-page">
 <a class="btn btn-soft mb-3" asp-action="Index">‹ กลับสต็อก</a><h1>ขายรังนกจากล็อต</h1>
-<p>สำหรับการขายที่รับเงินครบแล้ว บันทึกครั้งเดียวจะตัดสต็อกและสร้างรายรับแยกตามตึก</p>
+<p>บันทึกครั้งเดียวจะตัดสต็อก ส่วนรายรับจะลงตามยอดเงินที่ได้รับจริง และรับชำระเพิ่มภายหลังได้</p>
 @if (!Model.Stock.Items.Any(x => x.RemainingWeightKg > 0)) { <div class="alert alert-info">ยังไม่มีสินค้าคงเหลือพร้อมขาย</div> }
 <form asp-action="Create" method="post" data-sale-form>
 <input asp-for="RequestId" type="hidden" />
@@ -19,10 +19,10 @@
 @for (var i = 0; i < Model.Items.Count; i++) { <partial name="_SaleLine" model="Model" view-data='new ViewDataDictionary(ViewData) { ["LineIndex"] = i }' /> }
 </div>
 <button class="btn btn-soft w-100 mb-3" type="button" data-add-sale-line>+ เพิ่มสินค้าจากล็อต</button>
-<div class="form-card"><label asp-for="Notes">หมายเหตุ</label><textarea asp-for="Notes" class="form-control" maxlength="2000" rows="3"></textarea><div class="form-check mt-3"><input asp-for="ReceivedInFull" class="form-check-input" required /><label asp-for="ReceivedInFull" class="form-check-label">ยืนยันว่าได้รับเงินครบแล้ว และยังไม่ได้บันทึกรายรับรายการนี้ซ้ำในหน้าการเงิน</label></div></div>
+<div class="form-card"><div class="row g-3"><div class="col-12"><label asp-for="Notes">หมายเหตุ</label><textarea asp-for="Notes" class="form-control" maxlength="2000" rows="3"></textarea></div><div class="col-md-6"><label asp-for="InitialPaidAmount">ยอดที่รับแล้วครั้งแรก (บาท)</label><input asp-for="InitialPaidAmount" class="form-control" inputmode="decimal" placeholder="0.00" /><small class="muted">เว้นว่างหรือ 0 หากยังไม่ได้รับเงิน</small></div><div class="col-md-6 form-field thai-date-field"><label asp-for="DueDate">วันครบกำหนดชำระ</label><input asp-for="DueDate" type="hidden" data-thai-date-value /><div class="thai-date-control"><input class="form-control" data-thai-datepicker data-target="DueDate" readonly placeholder="เลือกวันที่" /><button type="button" class="thai-date-trigger" data-thai-date-trigger aria-label="เปิดปฏิทิน">▦</button></div></div><div class="col-12 form-check mt-3"><input asp-for="ReceivedInFull" class="form-check-input" /><label asp-for="ReceivedInFull" class="form-check-label">ได้รับเงินครบแล้ว (ระบบจะใช้ยอดขายรวมแทนช่องยอดรับครั้งแรก)</label></div></div></div>
 <div class="stock-metrics mt-3" aria-live="polite"><div><small>น้ำหนักรวม</small><strong><span data-sale-total-kg>0.000</span> กก.</strong></div><div><small>ยอดขายรวม</small><strong><span data-sale-total>0.00</span> บาท</strong></div><div><small>เฉลี่ยต่อ กก.</small><strong><span data-sale-average>0.00</span> บาท</strong></div></div>
 <p class="muted">ยอดบนหน้าจอเป็นตัวอย่าง ระบบคำนวณและตรวจสต็อกอีกครั้งตอนบันทึก</p>
-<div class="sticky-save"><a class="btn btn-soft" asp-action="Index">ยกเลิก</a><button class="btn btn-primary" type="submit">บันทึกขายและรับเงิน</button></div>
+<div class="sticky-save"><a class="btn btn-soft" asp-action="Index">ยกเลิก</a><button class="btn btn-primary" type="submit">บันทึกการขาย</button></div>
 </form>
 <template data-sale-template><partial name="_SaleLine" model="@(new SaleCreateViewModel { Stock = Model.Stock })" view-data='new ViewDataDictionary(ViewData) { ["LineIndex"] = 0 }' /></template>
 </section>

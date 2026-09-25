@@ -39,7 +39,7 @@
 @if (showAppNav) { <partial name="_AppBottomNav" /> }
 @if (string.IsNullOrWhiteSpace(bodyClass))
 {
-  <footer class="site-footer"><div class="container"><a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">N</span><span>NOTENOKAND</span></a><div>@if(User.Identity?.IsAuthenticated == true){<a asp-controller="Dashboard" asp-action="Index">ภาพรวม</a><a asp-controller="Finance" asp-action="Index">การเงิน</a><a asp-controller="Calendar" asp-action="Index">ปฏิทิน</a><a asp-controller="Reports" asp-action="Index">รายงาน</a><a asp-controller="Profile" asp-action="Index">บัญชีของฉัน</a>}<a asp-controller="Home" asp-action="Terms">ข้อกำหนด</a><a asp-controller="Home" asp-action="Privacy">ความเป็นส่วนตัว</a><span>© 2026 Notenokand</span></div></div></footer>
+  <footer class="site-footer"><div class="container"><a class="brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">N</span><span>NOTENOKAND</span></a><div>@if(User.Identity?.IsAuthenticated == true){<a asp-controller="Dashboard" asp-action="Index">ภาพรวม</a><a asp-controller="Finance" asp-action="Index">การเงิน</a><a asp-controller="Calendar" asp-action="Index">ปฏิทิน</a><a asp-controller="Maintenance" asp-action="Index">ซ่อมบำรุง</a><a asp-controller="Quality" asp-action="Index">คุณภาพ</a><a asp-controller="Reports" asp-action="Index">รายงาน</a><a asp-controller="Profile" asp-action="Index">บัญชีของฉัน</a>}<a asp-controller="Home" asp-action="Terms">ข้อกำหนด</a><a asp-controller="Home" asp-action="Privacy">ความเป็นส่วนตัว</a><span>© 2026 Notenokand</span></div></div></footer>
 }
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

@@ -24,12 +24,14 @@ public sealed class LotSaleValidationTests
         Assert.False(Validator.TryValidateObject(item, new ValidationContext(item), [], true));
     }
     [Fact]
-    public void RejectsDuplicateLotsAndUnreceivedMoney()
+    public void RejectsDuplicateLotsAndMissingDueDateForOutstandingBalance()
     {
         var id = Guid.NewGuid();
-        var model = new SaleCreateViewModel { Items = [new() { HarvestItemId = id }, new() { HarvestItemId = id }] };
+        var model = new SaleCreateViewModel { Items = [
+            new() { HarvestItemId = id, WeightKg = 1m, PricePerKg = 10m },
+            new() { HarvestItemId = id, WeightKg = 1m, PricePerKg = 10m }] };
         var errors = model.Validate(new ValidationContext(model)).ToList();
-        Assert.Contains(errors, x => x.MemberNames.Contains(nameof(model.ReceivedInFull)));
+        Assert.Contains(errors, x => x.MemberNames.Contains(nameof(model.DueDate)));
         Assert.Contains(errors, x => x.MemberNames.Contains(nameof(model.Items)));
     }
     [Fact]

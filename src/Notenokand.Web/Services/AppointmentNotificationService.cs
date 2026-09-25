@@ -30,6 +30,13 @@ public sealed class AppointmentNotificationService(NotenokandDbContext db)
         foreach (var item in appointments)
             if (item.Building is not null && (item.Building.AccountId != accountId || item.Building.IsDeleted))
                 item.Building = null;
-        return new() { LocalNow = now, Appointments = appointments };
+        var maintenance = await db.MaintenanceJobs.AsNoTracking()
+            .Where(x => db.BirdBuildings.Any(b => b.Id == x.BuildingId && b.AccountId == accountId && !b.IsDeleted) &&
+                !x.IsDeleted && x.Status != MaintenanceStatus.Completed && x.Status != MaintenanceStatus.Cancelled)
+            .OrderByDescending(x => x.Priority).ThenBy(x => x.ReportedAt).Take(20).ToListAsync();
+        var maintenanceBuildingIds = maintenance.Select(x => x.BuildingId).Distinct().ToArray();
+        var buildingNames = await db.BirdBuildings.AsNoTracking().Where(x => x.AccountId == accountId && maintenanceBuildingIds.Contains(x.Id))
+            .ToDictionaryAsync(x => x.Id, x => x.Name);
+        return new() { LocalNow = now, Appointments = appointments, MaintenanceJobs = maintenance, MaintenanceBuildingNames = buildingNames };
     }
 }

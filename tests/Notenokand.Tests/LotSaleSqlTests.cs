@@ -112,6 +112,21 @@ public sealed class LotSaleSqlTests
             var duplicateIds = await Task.WhenAll(Create(duplicate), Create(duplicate));
             Assert.Equal(duplicateIds[0], duplicateIds[1]);
             Assert.Equal(1.75m, await Balance(second.Id));
+            var partial = Request((second.Id, .25m));
+            partial.ReceivedInFull = false;
+            partial.InitialPaidAmount = 10m;
+            partial.DueDate = date.AddDays(30);
+            var partialId = await Create(partial);
+            await using (var paymentDb = Open())
+                await new LotSaleService(paymentDb).RecordPaymentAsync(account.Id, owner, partialId,
+                    new SalePaymentViewModel { Amount = 15m, PaidOn = partial.SaleDate, PaymentMethod = PaymentMethod.Cash });
+            await using (var paymentCheck = Open())
+            {
+                var paidSale = await paymentCheck.Sales.SingleAsync(x => x.Id == partialId);
+                Assert.Equal(25m, paidSale.PaidAmount);
+                Assert.Equal(PaymentStatus.Paid, paidSale.PaymentStatus);
+                Assert.Equal(25m, await paymentCheck.FinancialTransactions.Where(x => x.SaleId == partialId && !x.IsDeleted).SumAsync(x => x.Amount));
+            }
         }
         finally
         {

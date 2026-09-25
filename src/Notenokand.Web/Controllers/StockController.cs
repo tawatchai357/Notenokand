@@ -103,4 +103,20 @@ public sealed class StockController(NotenokandDbContext db, AppointmentNotificat
         catch (SqlException ex) when (ex.Number is 1205 or 51000) { TempData["StockError"] = "มีรายการกำลังบันทึก กรุณาลองอีกครั้ง"; }
         return RedirectToAction(nameof(Details), new { id });
     }
+
+    [HttpPost("sales/{id:guid}/payment")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Payment(Guid id, SalePaymentViewModel model)
+    {
+        var context = await ContextAsync(); if (context is null) return Forbid();
+        if (!ModelState.IsValid) TempData["StockError"] = "ข้อมูลรับชำระไม่ถูกต้อง";
+        else try
+        {
+            await sales.RecordPaymentAsync(context.Value.AccountId, context.Value.UserId, id, model);
+            TempData["SuccessMessage"] = "บันทึกรับชำระและเชื่อมรายรับแล้ว";
+        }
+        catch (LotSaleException ex) { TempData["StockError"] = ex.Message; }
+        catch (SqlException ex) when (ex.Number is 1205 or 51000) { TempData["StockError"] = "มีรายการกำลังบันทึก กรุณาลองอีกครั้ง"; }
+        return RedirectToAction(nameof(Details), new { id });
+    }
 }

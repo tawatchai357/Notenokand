@@ -5,9 +5,22 @@
 <section class="notification-page">
     <div class="notification-heading"><div><span class="eyebrow">นัดหมายและงานค้าง</span><h1>แจ้งเตือน</h1><p>ซ่อมบำรุง · เก็บรังนก · ขายรังนก</p></div><a class="btn btn-soft" asp-controller="Calendar" asp-action="Index">เปิดปฏิทิน</a></div>
     <p class="muted">ข้อมูล ณ @Model.LocalNow.ToString("d MMM yyyy HH:mm", thai) น. (เวลาไทย) · <a asp-action="Index">รีเฟรชข้อมูล</a></p>
-    <div class="notification-summary"><div><small>เลยกำหนด</small><strong class="text-danger">@Model.OverdueCount</strong></div><div><small>วันนี้</small><strong>@Model.TodayCount</strong></div><div><small>ล่วงหน้า 7 วัน</small><strong>@Model.UpcomingCount</strong></div></div>
+    <div class="notification-summary"><div><small>เลยกำหนด</small><strong class="text-danger">@Model.OverdueCount</strong></div><div><small>วันนี้</small><strong>@Model.TodayCount</strong></div><div><small>งานซ่อมค้าง</small><strong>@Model.PendingMaintenanceCount</strong></div></div>
     <p class="muted mt-3">แสดงเฉพาะนัดหมายที่ยังไม่เสร็จ งานที่ไม่ระบุเวลาจะถือว่าเลยกำหนดเมื่อพ้นวันนัด</p>
-    @if (Model.Appointments.Count == 0) { <div class="content-card empty-state"><h2>ไม่มีงานค้างหรือนัดหมายใกล้ถึง</h2><p>นัดหมายที่เสร็จแล้วหรือยกเลิกจะไม่แสดงที่นี่</p><a class="btn btn-primary" asp-controller="Calendar" asp-action="Create">+ เพิ่มนัดหมาย</a></div> }
+    @if (Model.TotalCount == 0) { <div class="content-card empty-state"><h2>ไม่มีงานค้างหรือนัดหมายใกล้ถึง</h2><p>รายการที่เสร็จแล้วหรือยกเลิกจะไม่แสดงที่นี่</p><a class="btn btn-primary" asp-controller="Calendar" asp-action="Create">+ เพิ่มนัดหมาย</a></div> }
+    @if(Model.MaintenanceJobs.Count > 0){
+        <section class="notification-group">
+            <div class="section-toolbar"><h2>งานซ่อมบำรุงที่ยังไม่ปิด</h2><a asp-controller="Maintenance" asp-action="Index">ดูทั้งหมด</a></div>
+            @foreach(var job in Model.MaintenanceJobs){
+                <article class="content-card notification-card">
+                    <small class="eyebrow">@Model.MaintenanceBuildingNames.GetValueOrDefault(job.BuildingId, "ไม่พบตึก")</small>
+                    <h3>@job.Issue</h3>
+                    <p>แจ้งเมื่อ @job.ReportedAt.ToOffset(TimeSpan.FromHours(7)).ToString("d MMM yyyy HH:mm", thai) · สถานะ @job.Status</p>
+                    <a class="btn btn-soft" asp-controller="Maintenance" asp-action="Edit" asp-route-id="@job.Id">เปิดงาน / อัปเดตสถานะ</a>
+                </article>
+            }
+        </section>
+    }
     @foreach (var group in new[] { "overdue", "today", "upcoming" }) {
         var items = Model.Appointments.Where(x => Model.Group(x) == group).ToList();
         if (items.Count == 0) { continue; }

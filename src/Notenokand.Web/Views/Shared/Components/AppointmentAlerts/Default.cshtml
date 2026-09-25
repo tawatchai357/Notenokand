@@ -1,5 +1,5 @@
 @model Notenokand.Web.Models.Notifications.NotificationViewModel
-<a class="appointment-alert-link" asp-controller="Notifications" asp-action="Index" aria-label="แจ้งเตือนนัดหมาย @Model.Appointments.Count รายการ งานเลยกำหนด @Model.OverdueCount รายการ">
+<a class="appointment-alert-link" asp-controller="Notifications" asp-action="Index" aria-label="แจ้งเตือนและงานค้าง @Model.TotalCount รายการ งานเลยกำหนด @Model.OverdueCount รายการ">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
-    <span>แจ้งเตือน</span><b class="@(Model.OverdueCount > 0 ? "alert-overdue" : "")">@Model.Appointments.Count</b>
+    <span>แจ้งเตือน</span><b class="@(Model.OverdueCount > 0 ? "alert-overdue" : "")">@Model.TotalCount</b>
 </a>

@@ -5,6 +5,10 @@ public sealed class NotificationViewModel
 {
     public DateTime LocalNow { get; init; }
     public IReadOnlyList<CalendarAppointment> Appointments { get; init; } = [];
+    public IReadOnlyList<MaintenanceJob> MaintenanceJobs { get; init; } = [];
+    public IReadOnlyDictionary<Guid, string> MaintenanceBuildingNames { get; init; } = new Dictionary<Guid, string>();
+    public int TotalCount => Appointments.Count + MaintenanceJobs.Count;
+    public int PendingMaintenanceCount => MaintenanceJobs.Count;
     public int OverdueCount => Appointments.Count(x => IsOverdue(x, LocalNow));
     public int TodayCount => Appointments.Count(x => !IsOverdue(x, LocalNow) && x.ScheduledDate == DateOnly.FromDateTime(LocalNow));
     public int UpcomingCount => Appointments.Count - OverdueCount - TodayCount;

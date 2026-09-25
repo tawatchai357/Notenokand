@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Notenokand.Domain.Entities;
 using Notenokand.Infrastructure.Persistence;
 using Notenokand.Web.Controllers;
+using Notenokand.Web.Models.Maintenance;
+using Notenokand.Web.Models.Quality;
 
 namespace Notenokand.Tests;
 
@@ -45,5 +47,30 @@ public sealed class AccountAuditHarvestTests
         Assert.DoesNotContain("private/path.jpg", json);
         Assert.DoesNotContain("secret-hash", json);
         Assert.Contains(nameof(BirdBuilding.Name), json);
+    }
+
+    [Fact]
+    public void CompletedMaintenanceRequiresAcceptanceResult()
+    {
+        var model = new MaintenanceEditViewModel
+        {
+            BuildingId = Guid.NewGuid(), Issue = "ตรวจระบบเสียง",
+            Status = Notenokand.Domain.Enums.MaintenanceStatus.Completed
+        };
+        var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+        Assert.False(System.ComponentModel.DataAnnotations.Validator.TryValidateObject(
+            model, new System.ComponentModel.DataAnnotations.ValidationContext(model), results, true));
+        Assert.Contains(results, x => x.MemberNames.Contains(nameof(model.AcceptanceResult)));
+    }
+
+    [Theory]
+    [InlineData(-0.1)]
+    [InlineData(100.1)]
+    public void QualityScoreMustStayWithinOneHundred(decimal score)
+    {
+        var model = new QualityScoreEditViewModel { HarvestRoundId = Guid.NewGuid(), TotalScore = score };
+        var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+        Assert.False(System.ComponentModel.DataAnnotations.Validator.TryValidateObject(
+            model, new System.ComponentModel.DataAnnotations.ValidationContext(model), results, true));
     }
 }

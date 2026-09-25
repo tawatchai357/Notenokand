@@ -1,0 +1,12 @@
+@using Notenokand.Domain.Enums
+@model Notenokand.Web.Models.Quality.QualityIndexViewModel
+@{ ViewData["Title"]="ตรวจคุณภาพรังนก"; var thai=new System.Globalization.CultureInfo("th-TH"); string trend=Model.Trend switch { QualityTrend.Better=>"ดีขึ้น", QualityTrend.Worse=>"ลดลง", QualityTrend.Stable=>"คงที่", _=>"ข้อมูลยังไม่พอ" }; }
+<section class="finance-page">
+  @if(TempData["QualityError"] is string error){<div class="alert alert-warning">@error</div>}
+  <div class="editor-heading"><div><span class="eyebrow">ควบคุมคุณภาพ</span><h1>คุณภาพรังนก</h1><p>ให้คะแนนรอบเก็บและติดตามแนวโน้มคุณภาพ</p></div><a class="btn btn-soft" asp-controller="Harvest" asp-action="Index">ดูรอบเก็บ</a></div>
+  <div class="building-metrics mb-3"><div><small>คะแนนเฉลี่ย</small><strong>@(Model.AverageScore?.ToString("N1") ?? "—") / 100</strong></div><div><small>แนวโน้ม</small><strong>@trend</strong></div></div>
+  @if(Model.Rounds.Count==0){<div class="content-card empty-state"><h2>ยังไม่มีรอบเก็บให้ตรวจ</h2><p>บันทึกการเก็บรังนกก่อน แล้วจึงประเมินคุณภาพของล็อต</p><a class="btn btn-primary" asp-controller="Harvest" asp-action="Create">บันทึกการเก็บ</a></div>}
+  <div class="harvest-history">@foreach(var row in Model.Rounds){<article class="content-card"><div class="section-toolbar"><div><span class="eyebrow">@row.Round.Building.Name · @row.Round.HarvestedOn.ToString("d MMM yyyy",thai)</span><h2>@row.Round.TotalWeightKg.ToString("N3") กก.</h2></div>@if(row.Score is not null){<div><strong>@row.Score.TotalScore.ToString("N1") / 100</strong><small class="d-block muted">@row.Score.ResultLabel</small></div>}</div>
+    <form asp-action="Score" method="post" class="row g-3 mt-1"><input type="hidden" name="HarvestRoundId" value="@row.Round.Id" /><div class="col-sm-4 form-field"><label>คะแนนรวม (0–100)</label><input class="form-control" name="TotalScore" type="number" min="0" max="100" step="0.1" value="@row.Score?.TotalScore.ToString(System.Globalization.CultureInfo.InvariantCulture)" required /></div><div class="col-sm-8 form-field"><label>คำอธิบาย / จุดที่ต้องปรับปรุง</label><input class="form-control" name="Explanation" maxlength="2000" value="@row.Score?.Explanation" /></div><div class="col-12 text-end"><button class="btn btn-primary">@(row.Score is null ? "บันทึกคะแนน" : "อัปเดตคะแนน")</button></div></form>
+  </article>}</div>
+</section>

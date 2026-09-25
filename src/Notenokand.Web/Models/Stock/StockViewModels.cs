@@ -23,6 +23,8 @@ public sealed class SaleCreateViewModel : IValidatableObject
     [EnumDataType(typeof(PaymentMethod))] public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.BankTransfer;
     [StringLength(2000)] public string? Notes { get; set; }
     public bool ReceivedInFull { get; set; }
+    [Range(typeof(decimal), "0", "99999999999999", ErrorMessage = "ยอดรับเงินไม่ถูกต้อง")] public decimal? InitialPaidAmount { get; set; }
+    public DateOnly? DueDate { get; set; }
     public List<SaleLineInput> Items { get; set; } = [new()];
     public StockPageViewModel Stock { get; set; } = new();
     public decimal TotalKg => Items.Sum(x => x.WeightKg);
@@ -32,7 +34,10 @@ public sealed class SaleCreateViewModel : IValidatableObject
         if (RequestId == Guid.Empty) yield return new("รหัสคำขอไม่ถูกต้อง กรุณาเปิดแบบฟอร์มใหม่");
         if (SaleDate == default || SaleDate > DateOnly.FromDateTime(DateTime.UtcNow.AddHours(7)))
             yield return new("วันที่ขายต้องไม่อยู่ในอนาคต", [nameof(SaleDate)]);
-        if (!ReceivedInFull) yield return new("รองรับการขายที่รับเงินครบแล้ว กรุณายืนยันการรับเงิน", [nameof(ReceivedInFull)]);
+        var paid = ReceivedInFull ? TotalAmount : InitialPaidAmount ?? 0;
+        if (paid > TotalAmount) yield return new("ยอดรับเงินต้องไม่เกินยอดขายรวม", [nameof(InitialPaidAmount)]);
+        if (paid < TotalAmount && !DueDate.HasValue) yield return new("กรุณาระบุวันครบกำหนดสำหรับยอดค้างชำระ", [nameof(DueDate)]);
+        if (DueDate.HasValue && DueDate.Value < SaleDate) yield return new("วันครบกำหนดต้องไม่ก่อนวันที่ขาย", [nameof(DueDate)]);
         if (Items is null || Items.Count is < 1 or > 100)
             yield return new("เลือกสินค้าระหว่าง 1–100 รายการ", [nameof(Items)]);
         else
@@ -41,6 +46,20 @@ public sealed class SaleCreateViewModel : IValidatableObject
                 yield return new("เลือกสินค้ารายการเดียวกันซ้ำ กรุณารวมน้ำหนักในแถวเดียว", [nameof(Items)]);
             if (TotalAmount > 99999999999999m) yield return new("ยอดขายรวมสูงเกินขีดจำกัด");
         }
+    }
+}
+
+public sealed class SalePaymentViewModel : IValidatableObject
+{
+    public Guid RequestId { get; set; } = Guid.NewGuid();
+    [Range(typeof(decimal), "0.01", "99999999999999", ErrorMessage = "ยอดรับชำระต้องมากกว่า 0")] public decimal Amount { get; set; }
+    public DateOnly PaidOn { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(7));
+    [EnumDataType(typeof(PaymentMethod))] public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.BankTransfer;
+    public IEnumerable<ValidationResult> Validate(ValidationContext context)
+    {
+        if (RequestId == Guid.Empty) yield return new("รหัสคำขอไม่ถูกต้อง");
+        if (PaidOn == default || PaidOn > DateOnly.FromDateTime(DateTime.UtcNow.AddHours(7)))
+            yield return new("วันที่รับเงินต้องไม่อยู่ในอนาคต", [nameof(PaidOn)]);
     }
 }
 
