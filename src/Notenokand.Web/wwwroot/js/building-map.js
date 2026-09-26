@@ -6,6 +6,7 @@
   const latitudeLabel = document.querySelector('[data-latitude-label]');
   const longitudeLabel = document.querySelector('[data-longitude-label]');
   const currentButton = document.querySelector('[data-current-location]');
+  const mapHelp = element.parentElement?.querySelector('.map-help');
   const initialLatitude = Number.parseFloat(latitudeInput.value);
   const initialLongitude = Number.parseFloat(longitudeInput.value);
   const hasInitialLocation = Number.isFinite(initialLatitude) && Number.isFinite(initialLongitude);
@@ -24,12 +25,26 @@
   }
   if (hasInitialLocation) setLocation(initialLatitude, initialLongitude, false);
   map.on('click', event => setLocation(event.latlng.lat, event.latlng.lng));
+  const localHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+  const insecureMobileAccess = !window.isSecureContext && !localHost;
+  if (insecureMobileAccess && mapHelp)
+    mapHelp.textContent = 'ตำแหน่งปัจจุบันต้องเปิดผ่าน HTTPS · ระหว่างทดสอบผ่าน IP แบบ HTTP ให้แตะแผนที่เพื่อปักหมุดแทน';
   currentButton?.addEventListener('click', () => {
-    if (!navigator.geolocation) return window.Swal?.fire({ icon: 'error', title: 'อุปกรณ์ไม่รองรับตำแหน่ง' });
+    if (insecureMobileAccess) {
+      return window.Swal?.fire({ icon: 'info', title: 'ต้องใช้ HTTPS', text: 'เบราว์เซอร์มือถือไม่อนุญาตตำแหน่งปัจจุบันบน HTTP กรุณาแตะแผนที่เพื่อปักหมุดก่อน เมื่อเปิดระบบผ่าน HTTPS ปุ่มนี้จะใช้งานได้', confirmButtonColor: '#1565d8' });
+    }
+    if (!navigator.geolocation) return window.Swal?.fire({ icon: 'error', title: 'อุปกรณ์ไม่รองรับตำแหน่ง', text: 'กรุณาแตะแผนที่เพื่อปักหมุดแทน', confirmButtonColor: '#1565d8' });
     currentButton.disabled = true; currentButton.textContent = 'กำลังค้นหา...';
     navigator.geolocation.getCurrentPosition(
       position => { setLocation(position.coords.latitude, position.coords.longitude); currentButton.disabled = false; currentButton.textContent = '◎ ตำแหน่งปัจจุบัน'; },
-      () => { currentButton.disabled = false; currentButton.textContent = '◎ ตำแหน่งปัจจุบัน'; window.Swal?.fire({ icon: 'warning', title: 'ไม่พบตำแหน่ง', text: 'กรุณาอนุญาตตำแหน่ง หรือแตะบนแผนที่เพื่อปักหมุด', confirmButtonColor: '#1565d8' }); },
+      error => {
+        currentButton.disabled = false;
+        currentButton.textContent = '◎ ตำแหน่งปัจจุบัน';
+        const message = error.code === error.PERMISSION_DENIED ? 'กรุณาอนุญาตสิทธิ์ตำแหน่งให้เว็บไซต์ในตั้งค่าเบราว์เซอร์'
+          : error.code === error.TIMEOUT ? 'ค้นหาตำแหน่งไม่ทันเวลา กรุณาเปิด GPS แล้วลองใหม่'
+          : 'อุปกรณ์ยังระบุตำแหน่งไม่ได้ กรุณาเปิด GPS หรือแตะแผนที่เพื่อปักหมุด';
+        window.Swal?.fire({ icon: 'warning', title: 'ไม่พบตำแหน่ง', text: message, confirmButtonColor: '#1565d8' });
+      },
       { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
     );
   });
