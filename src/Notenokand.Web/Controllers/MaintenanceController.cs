@@ -27,6 +27,7 @@ public sealed class MaintenanceController(NotenokandDbContext db) : Controller
         {
             Jobs = status.HasValue ? all.Where(x => x.Status == status.Value).ToList() : all,
             BuildingNames = names, Status = status,
+            StatusCounts = Enum.GetValues<MaintenanceStatus>().ToDictionary(s => s, s => all.Count(x => x.Status == s)),
             OpenCount = all.Count(x => x.Status is not MaintenanceStatus.Completed and not MaintenanceStatus.Cancelled),
             TotalCost = all.Where(x => x.Status == MaintenanceStatus.Completed).Sum(x => x.PartsCost + x.LaborCost)
         });

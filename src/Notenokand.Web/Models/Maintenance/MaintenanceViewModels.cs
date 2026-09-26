@@ -30,6 +30,7 @@ public sealed class MaintenanceIndexViewModel
 {
     public IReadOnlyList<Notenokand.Domain.Entities.MaintenanceJob> Jobs { get; init; } = [];
     public IReadOnlyDictionary<Guid, string> BuildingNames { get; init; } = new Dictionary<Guid, string>();
+    public IReadOnlyDictionary<MaintenanceStatus, int> StatusCounts { get; init; } = new Dictionary<MaintenanceStatus, int>();
     public MaintenanceStatus? Status { get; init; }
     public int OpenCount { get; init; }
     public decimal TotalCost { get; init; }

@@ -2,13 +2,21 @@
 @model Notenokand.Web.Models.Maintenance.MaintenanceIndexViewModel
 @functions {
     string StatusName(MaintenanceStatus value) => value switch { MaintenanceStatus.Reported => "แจ้งงาน", MaintenanceStatus.InProgress => "กำลังทำ", MaintenanceStatus.AwaitingAcceptance => "รอตรวจรับ", MaintenanceStatus.Completed => "เสร็จแล้ว", _ => "ยกเลิก" };
+    string StatusIcon(MaintenanceStatus value) => value switch { MaintenanceStatus.Reported => "!", MaintenanceStatus.InProgress => "↻", MaintenanceStatus.AwaitingAcceptance => "⌕", MaintenanceStatus.Completed => "✓", _ => "×" };
     string PriorityName(MaintenancePriority value) => value switch { MaintenancePriority.Urgent => "เร่งด่วน", MaintenancePriority.High => "สูง", MaintenancePriority.Normal => "ปกติ", _ => "ต่ำ" };
 }
 @{ ViewData["Title"]="งานซ่อมบำรุง"; }
+@section Head { <link rel="stylesheet" href="~/css/maintenance.css" asp-append-version="true" /> }
 <section class="finance-page">
   <div class="editor-heading"><div><span class="eyebrow">ดูแลงานและต้นทุน</span><h1>งานซ่อมบำรุง</h1><p>ติดตามตั้งแต่แจ้งปัญหาจนถึงตรวจรับงาน</p></div><a class="btn btn-primary" asp-action="Create">+ เพิ่มงาน</a></div>
-  <div class="building-metrics mb-3"><div><small>งานค้าง</small><strong>@Model.OpenCount งาน</strong></div><div><small>ต้นทุนงานที่เสร็จ</small><strong>฿@Model.TotalCost.ToString("N2")</strong></div></div>
-  <div class="filter-pills mb-3"><a class="@(Model.Status is null ? "active" : "")" asp-action="Index">ทั้งหมด</a>@foreach(var s in Enum.GetValues<MaintenanceStatus>()){<a class="@(Model.Status == s ? "active" : "")" asp-action="Index" asp-route-status="@s">@StatusName(s)</a>}</div>
+  <div class="maintenance-summary">
+    <article><span class="maintenance-summary-icon open">⌁</span><div><small>งานที่ต้องติดตาม</small><strong>@Model.OpenCount <em>งาน</em></strong></div></article>
+    <article><span class="maintenance-summary-icon cost">฿</span><div><small>ต้นทุนงานที่เสร็จ</small><strong>@Model.TotalCost.ToString("N2") <em>บาท</em></strong></div></article>
+  </div>
+  <nav class="maintenance-filters" aria-label="กรองสถานะงานซ่อมบำรุง">
+    <a class="maintenance-filter all @(Model.Status is null ? "active" : "")" asp-action="Index" aria-current="@(Model.Status is null ? "page" : null)"><span class="filter-icon">▦</span><span class="filter-copy"><strong>ทั้งหมด</strong><small>@Model.StatusCounts.Values.Sum() งาน</small></span></a>
+    @foreach(var s in Enum.GetValues<MaintenanceStatus>()){<a class="maintenance-filter status-@((int)s) @(Model.Status == s ? "active" : "")" asp-action="Index" asp-route-status="@s" aria-current="@(Model.Status == s ? "page" : null)"><span class="filter-icon">@StatusIcon(s)</span><span class="filter-copy"><strong>@StatusName(s)</strong><small>@Model.StatusCounts.GetValueOrDefault(s) งาน</small></span></a>}
+  </nav>
   @if(Model.Jobs.Count == 0){<div class="content-card empty-state"><h2>ไม่พบงานซ่อมบำรุง</h2><p>เพิ่มงานจากปัญหาที่พบ หรืองานตรวจเชิงป้องกันตามรอบ</p><a class="btn btn-soft" asp-action="Create">สร้างงานแรก</a></div>}
   <div class="harvest-history">
   @foreach(var item in Model.Jobs){
